@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { getPropertyById, updateProperty } from "../../api/property/propertyApi";
+import { Upload } from "lucide-react"; // Make sure this package is installed
 
 const UpdateLand = () => {
   const { id } = useParams();
@@ -15,6 +16,7 @@ const UpdateLand = () => {
     contactNumber: ""
   });
   const [image, setImage] = useState(null);
+  const [imagePreview, setImagePreview] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -30,6 +32,9 @@ const UpdateLand = () => {
           price: data.price || "",
           contactNumber: data.contactNumber || ""
         });
+        if (data.image) {
+          setImagePreview(data.image);
+        }
       } catch (err) {
         setError("Failed to load property");
       } finally {
@@ -47,7 +52,11 @@ const UpdateLand = () => {
   };
 
   const handleImageChange = (e) => {
-    setImage(e.target.files[0]);
+    const file = e.target.files[0];
+    setImage(file);
+    if (file) {
+      setImagePreview(URL.createObjectURL(file));
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -68,8 +77,11 @@ const UpdateLand = () => {
 
   if (loading) return <p className="text-center mt-10">Loading...</p>;
 
+  const inputStyle =
+    "border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-400";
+
   return (
-    <div className="relative max-w-2xl mx-auto bg-white shadow-xl p-6 mt-8 rounded-2xl">
+    <div className="relative max-w-2xl mx-auto bg-white shadow-xl p-6 mt-6 rounded-2xl">
       {/* Top Right Close Button */}
       <button
         onClick={() => navigate("/my-properties")}
@@ -78,49 +90,49 @@ const UpdateLand = () => {
         ×
       </button>
 
-      <h2 className="text-2xl font-semibold mb-4">Update Property</h2>
-      {error && <p className="text-red-500 mb-4">{error}</p>}
+      <h2 className="text-xl font-semibold mb-4">Update Property</h2>
+      {error && <p className="text-red-500 mb-3">{error}</p>}
 
       <form onSubmit={handleSubmit} className="grid gap-4">
         <input
           type="text"
           name="title"
           placeholder="Title"
-          className="border border-gray-300 rounded-lg px-3 py-2"
+          className={inputStyle}
           value={formData.title}
           onChange={handleChange}
         />
         <textarea
           name="description"
           placeholder="Description"
-          className="border border-gray-300 rounded-lg px-3 py-2"
+          className={inputStyle}
           value={formData.description}
           onChange={handleChange}
         />
         <select
-  name="typeOfProperty"
-  className="border border-gray-300 rounded-lg px-3 py-2"
-  value={formData.typeOfProperty}
-  onChange={handleChange}
->
-  <option value="">Select Property Type</option>
-  <option value="Flats">Flats</option>
-  <option value="Builder Floors">Builder Floors</option>
-  <option value="House Villas">House Villas</option>
-  <option value="Plots">Plots</option>
-  <option value="Farmhouses">Farmhouses</option>
-  <option value="Hotels">Hotels</option>
-  <option value="Lands">Lands</option>
-  <option value="Office Spaces">Office Spaces</option>
-  <option value="Hostels">Hostels</option>
-  <option value="Shops Showrooms">Shops Showrooms</option>
-</select>
+          name="typeOfProperty"
+          className={inputStyle}
+          value={formData.typeOfProperty}
+          onChange={handleChange}
+        >
+          <option value="">Select Property Type</option>
+          <option value="Flats">Flats</option>
+          <option value="Builder Floors">Builder Floors</option>
+          <option value="House Villas">House Villas</option>
+          <option value="Plots">Plots</option>
+          <option value="Farmhouses">Farmhouses</option>
+          <option value="Hotels">Hotels</option>
+          <option value="Lands">Lands</option>
+          <option value="Office Spaces">Office Spaces</option>
+          <option value="Hostels">Hostels</option>
+          <option value="Shops Showrooms">Shops Showrooms</option>
+        </select>
 
         <input
           type="text"
           name="location"
           placeholder="Location"
-          className="border border-gray-300 rounded-lg px-3 py-2"
+          className={inputStyle}
           value={formData.location}
           onChange={handleChange}
         />
@@ -128,7 +140,7 @@ const UpdateLand = () => {
           type="number"
           name="price"
           placeholder="Price"
-          className="border border-gray-300 rounded-lg px-3 py-2"
+          className={inputStyle}
           value={formData.price}
           onChange={handleChange}
         />
@@ -136,18 +148,37 @@ const UpdateLand = () => {
           type="text"
           name="contactNumber"
           placeholder="Contact Number"
-          className="border border-gray-300 rounded-lg px-3 py-2"
+          className={inputStyle}
           value={formData.contactNumber}
           onChange={handleChange}
         />
-        <input
-          type="file"
-          accept="image/*"
-          onChange={handleImageChange}
-          className="border border-gray-300 rounded-lg px-3 py-2"
-        />
 
-        <div className="flex justify-between mt-4">
+        {/* Updated Image Upload UI */}
+        <div className="relative">
+          <label
+            htmlFor="image-upload"
+            className="flex flex-col items-center justify-center border-2 border-dashed border-gray-400 rounded-xl p-4 cursor-pointer hover:border-blue-500 transition"
+          >
+            <Upload className="w-6 h-6 text-blue-600 mb-2" />
+            <span className="text-sm text-gray-600">Click to upload an image</span>
+            <input
+              id="image-upload"
+              type="file"
+              accept="image/*"
+              onChange={handleImageChange}
+              className="hidden"
+            />
+          </label>
+          {imagePreview && (
+            <img
+              src={imagePreview}
+              alt="Preview"
+              className="mt-3 rounded-xl h-40 object-cover w-full border"
+            />
+          )}
+        </div>
+
+        <div className="flex justify-between mt-3">
           <button
             type="button"
             onClick={() => navigate("/my-properties")}

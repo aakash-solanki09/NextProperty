@@ -8,6 +8,7 @@ import Contact from "./pages/Contact";
 
 import Login from "./pages/auth/Login";
 import Signup from "./pages/auth/Signup";
+import Profile from "./pages/auth/Profile"; // ✅ New import
 
 import CreateLand from "./pages/property/CreateLand";
 import AllLands from "./pages/property/AllLands";
@@ -19,7 +20,7 @@ function App() {
   return (
     <>
       <NavBar />
-      <div className="pt-24 min-h-screen"> {/* push content below navbar */}
+      <div className="pt-24 min-h-screen">
         <Routes>
           {/* Public Routes */}
           <Route path="/" element={<Home />} />
@@ -53,13 +54,19 @@ function App() {
               </PrivateRoute>
             }
           />
-
-
           <Route
             path="/explore-properties"
             element={
-              <PrivateRoute> {/* Optional: make it public if you want */}
+              <PrivateRoute>
                 <AllPublicProperties />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/auth/profile"
+            element={
+              <PrivateRoute>
+                <Profile />
               </PrivateRoute>
             }
           />

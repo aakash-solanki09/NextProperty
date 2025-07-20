@@ -1,8 +1,9 @@
 // src/components/NavBar.js
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Menu, X } from "lucide-react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { logoutUser } from "../api/user/userApi"; // adjust path if needed
+import { logoutUser } from "../api/user/userApi";
+import { Building2 } from "lucide-react"; 
 
 export default function NavBar() {
   const location = useLocation();
@@ -10,6 +11,8 @@ export default function NavBar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
+  const profileRef = useRef(null);
 
   useEffect(() => {
     const checkToken = () => {
@@ -17,26 +20,36 @@ export default function NavBar() {
       setIsLoggedIn(!!token);
     };
 
-    checkToken(); // On mount
+    checkToken();
 
     const handleResize = () => setIsMobile(window.innerWidth < 768);
+    const handleClickOutside = (e) => {
+      if (profileRef.current && !profileRef.current.contains(e.target)) {
+        setIsProfileMenuOpen(false);
+      }
+    };
+
     window.addEventListener("resize", handleResize);
-    window.addEventListener("storage", checkToken); // Listen for token updates
+    window.addEventListener("storage", checkToken);
+    document.addEventListener("mousedown", handleClickOutside);
 
     return () => {
       window.removeEventListener("resize", handleResize);
       window.removeEventListener("storage", checkToken);
+      document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
 
   const toggleMobileMenu = () => setIsMobileMenuOpen(!isMobileMenuOpen);
+  const toggleProfileMenu = () => setIsProfileMenuOpen((prev) => !prev);
 
   const handleLogout = async () => {
     try {
       await logoutUser();
       localStorage.removeItem("token");
+      localStorage.removeItem("user");
       setIsLoggedIn(false);
-      window.dispatchEvent(new Event("storage")); // Broadcast logout
+      window.dispatchEvent(new Event("storage"));
       navigate("/");
     } catch (error) {
       console.error("Logout failed:", error.message);
@@ -45,23 +58,67 @@ export default function NavBar() {
     }
   };
 
+  const getInitials = () => {
+  try {
+    const user = JSON.parse(localStorage.getItem("user"));
+    if (!user?.name) return "--";
+
+    const names = user.name.trim().split(" ").filter(Boolean);
+
+    if (names.length === 1) {
+      return names[0][0].toUpperCase();
+    }
+
+    return (names[0][0] + names[1][0]).toUpperCase();
+  } catch {
+    return "--";
+  }
+};
+
   const navLinks = (
     <>
-      <Link to="/" className="hover:text-blue-500 transition">Home</Link>
-      <Link to="/about" className="hover:text-blue-500 transition">About</Link>
-      <Link to="/contact" className="hover:text-blue-500 transition">Contact Us</Link>
+      <Link
+        to="/"
+        className={`transition px-3 py-1 rounded border ${
+          location.pathname === "/" ? "border-gray-400 text-gray-300" : "border-transparent hover:text-white"
+        }`}
+      >
+        Home
+      </Link>
+
+      <Link
+        to="/about"
+        className={`transition px-3 py-1 rounded border ${
+          location.pathname === "/about" ? "border-gray-400 text-gray-300" : "border-transparent hover:text-white"
+        }`}
+      >
+        About
+      </Link>
+
+      <Link
+        to="/contact"
+        className={`transition px-3 py-1 rounded border ${
+          location.pathname === "/contact" ? "border-gray-400 text-gray-300" : "border-transparent hover:text-white"
+        }`}
+      >
+        Contact Us
+      </Link>
 
       {!isLoggedIn ? (
         <>
           <Link
             to="/auth/login"
-            className="hover:text-blue-400 transition border border-white px-3 py-1 rounded"
+            className={`transition px-3 py-1 rounded border ${
+              location.pathname === "/auth/login" ? "border-gray-400 text-gray-300" : "border-transparent hover:text-white"
+            }`}
           >
             Login
           </Link>
           <Link
             to="/auth/signup"
-            className="hover:text-blue-400 transition border border-white px-3 py-1 rounded"
+            className={`transition px-3 py-1 rounded border ${
+              location.pathname === "/auth/signup" ? "border-gray-400 text-gray-300" : "border-transparent hover:text-white"
+            }`}
           >
             Sign Up
           </Link>
@@ -70,28 +127,56 @@ export default function NavBar() {
         <>
           <Link
             to="/explore-properties"
-            className="hover:text-indigo-300 transition border border-white px-3 py-1 rounded"
+            className={`transition px-3 py-1 rounded border ${
+              location.pathname === "/explore-properties" ? "border-gray-400 text-gray-300" : "border-transparent hover:text-white"
+            }`}
           >
             Explore Properties
           </Link>
           <Link
             to="/create-property"
-            className="hover:text-green-300 transition border border-white px-3 py-1 rounded"
+            className={`transition px-3 py-1 rounded border ${
+              location.pathname === "/create-property" ? "border-gray-400 text-gray-300" : "border-transparent hover:text-white"
+            }`}
           >
             Create Property
           </Link>
           <Link
             to="/my-properties"
-            className="hover:text-yellow-300 transition border border-white px-3 py-1 rounded"
+            className={`transition px-3 py-1 rounded border ${
+              location.pathname === "/my-properties" ? "border-gray-400 text-gray-300" : "border-transparent hover:text-white"
+            }`}
           >
             My Properties
           </Link>
-          <button
-            onClick={handleLogout}
-            className="hover:text-red-400 transition border border-white px-3 py-1 rounded"
-          >
-            Logout
-          </button>
+
+          {/* Profile Dropdown */}
+          <div className="relative" ref={profileRef}>
+            <button
+              onClick={toggleProfileMenu}
+              className="w-10 h-10 bg-white text-blue-900 font-semibold rounded-full flex items-center justify-center border border-gray-300"
+              title="Profile"
+            >
+              {getInitials()}
+            </button>
+            {isProfileMenuOpen && (
+             <div className="absolute left-0 md:left-auto md:right-0 top-full mt-1 w-36 bg-white text-sm text-gray-800 rounded shadow-lg z-50">
+                <Link
+                  to="/auth/profile"
+                  className="block px-4 py-2 hover:bg-gray-100"
+                  onClick={() => setIsProfileMenuOpen(false)}
+                >
+                  View Profile
+                </Link>
+                <button
+                  onClick={handleLogout}
+                  className="block w-full text-left px-4 py-2 hover:bg-gray-100"
+                >
+                  Logout
+                </button>
+              </div>
+            )}
+          </div>
         </>
       )}
     </>
@@ -101,13 +186,11 @@ export default function NavBar() {
     <header className="bg-blue-900 text-white fixed top-0 left-0 w-full z-50 shadow-md font-urbanist">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-10 py-4 flex justify-between items-center">
         {/* Logo */}
-        <div className="flex-shrink-0">
-          <img
-            src={"../../src/assets/logoNextProperty.png"}
-            alt="NextProperty Logo"
-            className="h-16 w-32 rounded-xl"
-          />
-        </div>
+        <div className="flex-shrink-0 flex items-center space-x-2">
+  <Building2 className="text-white w-8 h-8" />
+  <span className="text-white text-lg font-semibold tracking-wide">NextProperty</span>
+</div>
+
 
         {/* Desktop Navigation */}
         <nav className="hidden md:flex space-x-4 text-sm font-medium items-center">
@@ -124,7 +207,7 @@ export default function NavBar() {
 
       {/* Mobile Menu */}
       {isMobileMenuOpen && (
-        <div className="md:hidden px-4 pb-4 flex flex-col space-y-4 bg-black sm:bg-slate-800 text-white">
+        <div className="md:hidden px-4 pb-4 flex flex-col space-y-4 bg-blue-800 sm:bg-blue-800 text-white">
           {navLinks}
         </div>
       )}

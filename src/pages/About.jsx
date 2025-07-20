@@ -15,7 +15,7 @@ export default function About() {
             <div key={idx} className="bg-white rounded-xl shadow p-4">
               <img src={img} className="rounded-xl h-52 w-full object-cover mb-4" />
               <h3 className="text-lg font-bold">Beautiful Property #{idx + 1}</h3>
-              <p className="text-sm text-gray-600">Lorem ipsum dolor sit amet, consectetur.</p>
+              <p className="text-sm text-gray-600">This modern 2BHK apartment offers great ventilation and 24/7 water supply.</p>
             </div>
           ))}
         </div>

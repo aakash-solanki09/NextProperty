@@ -1,14 +1,14 @@
 const API_BASE_URL = "http://localhost:8000/api";
 
 // Signup API using fetch
-export const signupUser = async ({ email, password }) => {
+export const signupUser = async ({ name, email, password }) => {
   try {
     const res = await fetch(`${API_BASE_URL}/register`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ email, password }),
+      body: JSON.stringify({ name, email, password }), 
     });
 
     const data = await res.json();
@@ -42,10 +42,8 @@ export const loginUser = async ({ email, password }) => {
 
     // Save token to localStorage
     localStorage.setItem("token", data.token);
-
-  
+    localStorage.setItem("user", JSON.stringify(data.user)); 
     window.dispatchEvent(new Event("storage"));
-
     return data;
   } catch (error) {
     throw error || { message: "Login failed" };
@@ -79,5 +77,39 @@ export const logoutUser = async () => {
   } catch (err) {
     // Just log — don’t break logout
     console.warn("Logout request failed:", err.message || err);
+  }
+};
+
+
+export const getUserProfile = async () => {
+  const token = localStorage.getItem("token");
+
+  if (!token) {
+    throw { message: "No token found. Please login again." };
+  }
+
+  try {
+    const res = await fetch(`${API_BASE_URL}/profile`, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    // If response is HTML (i.e. server error), throw an error
+    const contentType = res.headers.get("content-type");
+    if (!contentType || !contentType.includes("application/json")) {
+      throw { message: "Unexpected server response. Please check the API." };
+    }
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      throw data;
+    }
+
+    return data;
+  } catch (error) {
+    throw error || { message: "Failed to fetch profile" };
   }
 };
