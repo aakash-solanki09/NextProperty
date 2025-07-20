@@ -3,7 +3,7 @@ import house2 from "../assets/house2.jpg";
 
 export default function About() {
   return (
-    <div className="flex flex-col min-h-[calc(100vh-64px)] bg-gray-100 text-black px-4 py-20 font-urbanist mt-16">
+    <div className="flex flex-col min-h-[calc(100vh-64px)] bg-gray-100 text-black px-4 py-20 font-urbanist">
       <div className="flex-grow">
         <h1 className="text-4xl font-bold text-center mb-8">About NextProperty</h1>
         <p className="text-center max-w-3xl mx-auto text-gray-700 mb-10">

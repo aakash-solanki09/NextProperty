@@ -183,7 +183,7 @@ export default function NavBar() {
   );
 
   return (
-    <header className="bg-blue-900 text-white fixed top-0 left-0 w-full z-50 shadow-md font-urbanist">
+    <header className="bg-blue-900 text-white fixed top-0 left-0 w-full z-50 shadow-md font-urbanist h-24 pt-4">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-10 py-4 flex justify-between items-center">
         {/* Logo */}
         <div className="flex-shrink-0 flex items-center space-x-2">

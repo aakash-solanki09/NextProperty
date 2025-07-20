@@ -22,7 +22,7 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen bg-white text-gray-900 flex items-center justify-center px-4 font-urbanist mt-10">
+    <div className="min-h-screen bg-white text-gray-900 flex items-center justify-center px-4 font-urbanist">
       <div className="bg-gray-100 shadow-xl p-8 rounded-lg w-full max-w-md">
         <h2 className="text-2xl font-bold mb-6 text-center">Login</h2>
         <form onSubmit={handleSubmit} className="space-y-4">
