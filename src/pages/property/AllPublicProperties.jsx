@@ -11,7 +11,7 @@ const AllPublicProperties = () => {
   const [imageIndexMap, setImageIndexMap] = useState({});
   const [showAlert, setShowAlert] = useState(false);
   const [alertMessage, setAlertMessage] = useState("");
-
+  const [modalImageIndex, setModalImageIndex] = useState(0);
   const [selectedProperty, setSelectedProperty] = useState(null); // For modal
 
   useEffect(() => {
@@ -231,24 +231,59 @@ const AllPublicProperties = () => {
         </div>
       )}
 
-      {/* Property Detail Modal */}
      {selectedProperty && (
   <div className="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center p-4">
     <div className="bg-white w-full max-w-5xl rounded-xl shadow-lg overflow-y-auto max-h-[90vh] relative flex flex-col lg:flex-row">
       <button
         className="absolute top-2 right-2 text-black text-2xl font-bold z-10"
-        onClick={() => setSelectedProperty(null)}
+        onClick={() => {
+          setSelectedProperty(null);
+          setModalImageIndex(0); // reset image index on close
+        }}
       >
         &times;
       </button>
 
-      {/* Image Section */}
-      <div className="w-full lg:w-[45%] h-64 lg:h-auto">
+      {/* Image Section with Arrows */}
+      <div className="w-full lg:w-[45%] h-64 lg:h-auto relative flex items-center justify-center">
         <img
-          src={selectedProperty.images?.[0] || selectedProperty.imageUrl}
+          src={
+            selectedProperty.images?.[modalImageIndex] ||
+            selectedProperty.imageUrl
+          }
           alt={selectedProperty.title}
           className="w-full h-full object-cover rounded-t-xl lg:rounded-l-xl lg:rounded-tr-none"
         />
+        {/* Left arrow */}
+        {selectedProperty.images?.length > 1 && (
+          <>
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                setModalImageIndex((prev) =>
+                  (prev - 1 + selectedProperty.images.length) %
+                  selectedProperty.images.length
+                );
+              }}
+              className="absolute left-2 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-40 text-white text-lg rounded-full w-8 h-8 flex items-center justify-center"
+            >
+              ‹
+            </button>
+
+            {/* Right arrow */}
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                setModalImageIndex((prev) =>
+                  (prev + 1) % selectedProperty.images.length
+                );
+              }}
+              className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-40 text-white text-lg rounded-full w-8 h-8 flex items-center justify-center"
+            >
+              ›
+            </button>
+          </>
+        )}
       </div>
 
       {/* Content Section */}
@@ -256,7 +291,7 @@ const AllPublicProperties = () => {
         <h2 className="text-2xl font-semibold mb-2">{selectedProperty.title}</h2>
         <p className="text-gray-600 mb-2">{selectedProperty.description}</p>
         <p className="font-bold text-xl text-blue-600 mb-2">₹{selectedProperty.price}</p>
-        <p className="text-gray-500 mb-1">📍 {selectedProperty.location}</p>
+        <p className="text-gray-500 mb-1"> {selectedProperty.location}</p>
         <p className="text-sm text-gray-700">
           <strong>Type:</strong> {selectedProperty.typeOfProperty}
         </p>
@@ -267,6 +302,7 @@ const AllPublicProperties = () => {
     </div>
   </div>
 )}
+
 
     </div>
   );
