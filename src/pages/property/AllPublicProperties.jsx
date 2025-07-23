@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { getAllPublicProperties } from "../../api/property/propertyApi";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
+import heroBg from "../../assets/pexels-thelazyartist-1642125.jpg";
 
 dayjs.extend(relativeTime);
 
@@ -150,7 +151,7 @@ const AllPublicProperties = () => {
           width: '100vw',
           height: '70vh',
           minHeight: 350,
-          backgroundImage: `url('/src/assets/pexels-thelazyartist-1642125.jpg')`,
+          backgroundImage: `url(${heroBg})`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           // borderRadius removed for square corners
