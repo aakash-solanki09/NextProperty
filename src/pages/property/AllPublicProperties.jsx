@@ -9,6 +9,10 @@ const AllPublicProperties = () => {
   const [priceRange, setPriceRange] = useState("");
   const [listingTypeFilter, setListingTypeFilter] = useState("");
   const [imageIndexMap, setImageIndexMap] = useState({});
+  const [showAlert, setShowAlert] = useState(false);
+  const [alertMessage, setAlertMessage] = useState("");
+
+  const [selectedProperty, setSelectedProperty] = useState(null); // For modal
 
   useEffect(() => {
     const fetchData = async () => {
@@ -20,8 +24,6 @@ const AllPublicProperties = () => {
         const indexMap = {};
         data.forEach((p) => (indexMap[p._id] = 0));
         setImageIndexMap(indexMap);
-
-        console.log("Listing Types:", data.map((p) => p.listingType));
       } catch (err) {
         console.error("Error fetching properties", err);
       }
@@ -75,6 +77,11 @@ const AllPublicProperties = () => {
       ...prev,
       [id]: (prev[id] - 1 + imagesLength) % imagesLength,
     }));
+  };
+
+  const showCustomAlert = (message) => {
+    setAlertMessage(message);
+    setShowAlert(true);
   };
 
   return (
@@ -134,7 +141,7 @@ const AllPublicProperties = () => {
         </div>
       </div>
 
-      {/* Properties */}
+      {/* Properties Grid */}
       <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
         {filteredProperties.map((property) => {
           const images = property.images || [property.imageUrl];
@@ -144,7 +151,8 @@ const AllPublicProperties = () => {
           return (
             <div
               key={property._id}
-              className="bg-white shadow-md rounded-xl overflow-hidden text-sm"
+              onClick={() => setSelectedProperty(property)}
+              className="bg-white shadow-md rounded-xl overflow-hidden text-sm cursor-pointer hover:shadow-lg transition"
             >
               <div className="relative h-40 overflow-hidden">
                 <img
@@ -155,13 +163,19 @@ const AllPublicProperties = () => {
                 {images.length > 1 && (
                   <div className="absolute inset-0 flex justify-between items-center px-2">
                     <button
-                      onClick={() => handlePrevImage(property._id, images.length)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handlePrevImage(property._id, images.length);
+                      }}
                       className="bg-black bg-opacity-40 text-white text-sm rounded-full w-7 h-7"
                     >
                       ‹
                     </button>
                     <button
-                      onClick={() => handleNextImage(property._id, images.length)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleNextImage(property._id, images.length);
+                      }}
                       className="bg-black bg-opacity-40 text-white text-sm rounded-full w-7 h-7"
                     >
                       ›
@@ -184,19 +198,15 @@ const AllPublicProperties = () => {
                       (property.listingType || "N/A").slice(1).toLowerCase()}
                   </span>
                 </p>
-
                 <div className="mt-3 flex justify-end space-x-2">
                   <button
-                    onClick={() => alert("Added to Interest")}
-                    className="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded text-xs"
-                  >
-                    Interested
-                  </button>
-                  <button
-                    onClick={() => alert("Property booked")}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      showCustomAlert("For more details, call us at: 1234567890");
+                    }}
                     className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-xs"
                   >
-                    Buy
+                    Call
                   </button>
                 </div>
               </div>
@@ -204,6 +214,60 @@ const AllPublicProperties = () => {
           );
         })}
       </div>
+
+      {/* Custom Alert */}
+      {showAlert && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="bg-white border border-blue-600 rounded-lg p-6 max-w-sm w-full shadow-xl text-center">
+            <h2 className="text-lg font-semibold text-black mb-2">📞 Contact Info</h2>
+            <p className="text-sm text-gray-700 mb-4">{alertMessage}</p>
+            <button
+              onClick={() => setShowAlert(false)}
+              className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Property Detail Modal */}
+     {selectedProperty && (
+  <div className="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center p-4">
+    <div className="bg-white w-full max-w-5xl rounded-xl shadow-lg overflow-y-auto max-h-[90vh] relative flex flex-col lg:flex-row">
+      <button
+        className="absolute top-2 right-2 text-black text-2xl font-bold z-10"
+        onClick={() => setSelectedProperty(null)}
+      >
+        &times;
+      </button>
+
+      {/* Image Section */}
+      <div className="w-full lg:w-[45%] h-64 lg:h-auto">
+        <img
+          src={selectedProperty.images?.[0] || selectedProperty.imageUrl}
+          alt={selectedProperty.title}
+          className="w-full h-full object-cover rounded-t-xl lg:rounded-l-xl lg:rounded-tr-none"
+        />
+      </div>
+
+      {/* Content Section */}
+      <div className="w-full lg:w-[55%]  p-5">
+        <h2 className="text-2xl font-semibold mb-2">{selectedProperty.title}</h2>
+        <p className="text-gray-600 mb-2">{selectedProperty.description}</p>
+        <p className="font-bold text-xl text-blue-600 mb-2">₹{selectedProperty.price}</p>
+        <p className="text-gray-500 mb-1">📍 {selectedProperty.location}</p>
+        <p className="text-sm text-gray-700">
+          <strong>Type:</strong> {selectedProperty.typeOfProperty}
+        </p>
+        <p className="text-sm text-gray-700">
+          <strong>Listing:</strong> {selectedProperty.listingType}
+        </p>
+      </div>
+    </div>
+  </div>
+)}
+
     </div>
   );
 };
