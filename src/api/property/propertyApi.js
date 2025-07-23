@@ -12,13 +12,13 @@ const getAuthHeaders = () => {
 export const createProperty = async (formData) => {
   try {
     const token = localStorage.getItem("token");
-    console.log("Creating property with token:", token);
+
     const response = await fetch(`${BASE_URL}/properties`, {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${token}`, // ✅ Token header
+        Authorization: `Bearer ${token}`,
       },
-      body: formData, // ✅ Must be FormData, don't set content-type manually
+      body: formData, 
     });
 
     const data = await response.json();
@@ -29,27 +29,7 @@ export const createProperty = async (formData) => {
 
     return data;
   } catch (error) {
-    throw error;
-  }
-};
-
-
-
-// GET all properties for logged-in user
-export const getAllProperties = async () => {
-  try {
-    const response = await fetch(`${BASE_URL}/properties`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        ...getAuthHeaders(),
-      },
-    });
-
-    const data = await response.json();
-    if (!response.ok) throw data;
-    return data;
-  } catch (error) {
+    console.error("Property creation error:", error);
     throw error;
   }
 };
@@ -77,7 +57,7 @@ export const getPropertyById = async (id) => {
 export const updateProperty = async (id, formData) => {
   try {
     const response = await fetch(`${BASE_URL}/properties/${id}`, {
-      method: 'PUT',
+      method: "PUT",
       headers: {
         ...getAuthHeaders(),
       },
@@ -85,45 +65,65 @@ export const updateProperty = async (id, formData) => {
     });
 
     const data = await response.json();
-    if (!response.ok) throw data;
+
+    if (!response.ok) {
+      throw new Error(data.message || "Failed to update property");
+    }
+
     return data;
   } catch (error) {
+    console.error("Error updating property:", error);
     throw error;
   }
 };
 
 // DELETE property by ID
+// propertyApi.js
+
 export const deleteProperty = async (id) => {
+  const token = localStorage.getItem("token");
+  console.log("Using token:", token); // Add this!
+
   try {
     const response = await fetch(`${BASE_URL}/properties/${id}`, {
-      method: 'DELETE',
+      method: "DELETE",
       headers: {
-        'Content-Type': 'application/json',
-        ...getAuthHeaders(),
+        Authorization: `Bearer ${token}`,
       },
     });
 
     const data = await response.json();
-    if (!response.ok) throw data;
+
+    if (!response.ok) {
+      console.error("Delete failed:", data);
+      throw new Error(data.message || "Failed to delete property");
+    }
+
     return data;
   } catch (error) {
+    console.error("Error deleting property:", error);
     throw error;
   }
 };
+
 export const getAllPublicProperties = async () => {
-  const token = localStorage.getItem("token");
+  try {
+    const response = await fetch(`${BASE_URL}/properties`, {
+      method: "GET",
+      // No Authorization needed if endpoint is truly public.
+      // Remove headers unless your backend requires auth even for "public" properties.
+    });
 
-  const res = await fetch(`${BASE_URL}/all-properties`, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
+    const data = await response.json();
 
-  if (!res.ok) {
-    const errorText = await res.text();
-    console.error("Backend error response:", errorText);
-    throw new Error("Failed to fetch public properties");
+    if (!response.ok) {
+      console.error("Error fetching public properties:", data.message || data);
+      throw new Error(data.message || "Failed to fetch public properties");
+    }
+
+    return data;
+  } catch (error) {
+    console.error("Fetch error:", error);
+    throw error;
   }
-
-  return res.json();
 };

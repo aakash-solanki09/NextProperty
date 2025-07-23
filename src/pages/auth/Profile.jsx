@@ -9,11 +9,8 @@ export default function Profile() {
     const fetchProfile = async () => {
       try {
         const response = await getUserProfile();
-
-        // Handle case where response has a 'user' property
         const userData = response.user ? response.user : response;
         setUser(userData);
-
         console.log("User profile fetched:", userData);
       } catch (err) {
         console.error("Failed to fetch profile", err);
@@ -43,6 +40,7 @@ export default function Profile() {
   return (
     <div className="max-w-2xl mx-auto mt-20 px-4 py-6 bg-white shadow-md rounded-lg font-urbanist">
       <h2 className="text-2xl font-bold mb-6 text-blue-900">User Profile</h2>
+
       <div className="space-y-4 text-gray-700">
         <div>
           <strong>Name:</strong> {user.name}
@@ -50,13 +48,31 @@ export default function Profile() {
         <div>
           <strong>Email:</strong> {user.email}
         </div>
-         <div>
-          <strong>Created At:</strong> {user.createdAt ? new Date(user.createdAt).toLocaleDateString() : "N/A"  }
-        </div>
-         <div>
-          <strong>Role :</strong> Buyer / Seller
+        {/* Hide 'Created At' for admin */}
+        {user.role !== "admin" && (
+          <div>
+            <strong>Created At:</strong>{" "}
+            {user.createdAt ? new Date(user.createdAt).toLocaleDateString() : "N/A"}
+          </div>
+        )}
+        <div>
+          <strong>Role :</strong> {user.role === "admin" ? "Admin" : "Buyer / Seller"}
         </div>
       </div>
+
+      {/* Show created ads only if user is NOT admin */}
+      {user.role !== "admin" && user.properties && user.properties.length > 0 && (
+        <div className="mt-10">
+          <h3 className="text-xl font-semibold mb-4 text-blue-800">Your Created Ads</h3>
+          <ul className="space-y-2 list-disc list-inside text-gray-600">
+            {user.properties.map((property) => (
+              <li key={property._id}>
+                {property.title} – ₹{property.price.toLocaleString()}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
     </div>
   );
 }

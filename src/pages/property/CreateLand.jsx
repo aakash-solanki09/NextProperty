@@ -1,50 +1,77 @@
 import React, { useState } from "react";
 import { createProperty } from "../../api/property/propertyApi";
 import { useNavigate } from "react-router-dom";
-import { Upload } from "lucide-react"; // Make sure this is installed
+import { Upload } from "lucide-react";
 
 const CreateLand = () => {
   const navigate = useNavigate();
+
   const [formData, setFormData] = useState({
     title: "",
     description: "",
     typeOfProperty: "",
+    listingType: "",
     location: "",
-    price: "",
-    contactNumber: ""
+    price: ""
   });
-  const [image, setImage] = useState(null);
-  const [imagePreview, setImagePreview] = useState(null);
+
+  const [images, setImages] = useState([]);
+  const [imagePreviews, setImagePreviews] = useState([]);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
   const handleImageChange = (e) => {
-    const file = e.target.files[0];
-    setImage(file);
-    if (file) {
-      setImagePreview(URL.createObjectURL(file));
+    const newFiles = Array.from(e.target.files);
+    const combined = [...images, ...newFiles];
+
+    if (combined.length > 5) {
+      setError("You can upload a maximum of 5 images.");
+      return;
     }
+
+    setImages(combined);
+    setImagePreviews(combined.map((file) => URL.createObjectURL(file)));
+  };
+
+  const handleRemoveImage = (index) => {
+    const newImages = [...images];
+    newImages.splice(index, 1);
+    setImages(newImages);
+    setImagePreviews(newImages.map(file => URL.createObjectURL(file)));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError(null);
     setSuccess(null);
+
+    const { title, description, typeOfProperty, listingType, location, price } = formData;
+    if (!title || !description || !typeOfProperty || !listingType || !location || !price) {
+      setError("Please fill in all fields.");
+      return;
+    }
+
     try {
+      setLoading(true);
+
       const data = new FormData();
       Object.entries(formData).forEach(([key, value]) => {
         data.append(key, value);
       });
-      if (image) data.append("image", image);
+      images.forEach((file) => data.append("images", file));
+
       await createProperty(data);
       setSuccess("Property created successfully!");
-      navigate("/my-properties");
+      navigate("/explore-properties");
     } catch (err) {
-      setError(err.message);
+      setError(err.message || "Failed to create property");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -56,6 +83,7 @@ const CreateLand = () => {
       <h2 className="text-xl font-semibold mb-4">Create Property</h2>
       {error && <p className="text-red-500 mb-3">{error}</p>}
       {success && <p className="text-green-600 mb-3">{success}</p>}
+
       <form onSubmit={handleSubmit} className="grid gap-4">
         <input
           type="text"
@@ -72,6 +100,7 @@ const CreateLand = () => {
           value={formData.description}
           onChange={handleChange}
         />
+
         <select
           name="typeOfProperty"
           className={inputStyle}
@@ -91,6 +120,17 @@ const CreateLand = () => {
           <option value="Shops Showrooms">Shops Showrooms</option>
         </select>
 
+        <select
+          name="listingType"
+          className={inputStyle}
+          value={formData.listingType}
+          onChange={handleChange}
+        >
+          <option value="">Select Listing Type</option>
+          <option value="sale">For Sale</option>
+          <option value="rent">For Rent</option>
+        </select>
+
         <input
           type="text"
           name="location"
@@ -107,45 +147,52 @@ const CreateLand = () => {
           value={formData.price}
           onChange={handleChange}
         />
-        <input
-          type="text"
-          name="contactNumber"
-          placeholder="Contact Number"
-          className={inputStyle}
-          value={formData.contactNumber}
-          onChange={handleChange}
-        />
 
-        {/* Updated Image Upload UI */}
+        {/* Multi-image upload with preview and remove */}
         <div className="relative">
           <label
             htmlFor="image-upload"
             className="flex flex-col items-center justify-center border-2 border-dashed border-gray-400 rounded-xl p-4 cursor-pointer hover:border-blue-500 transition"
           >
             <Upload className="w-6 h-6 text-blue-600 mb-2" />
-            <span className="text-sm text-gray-600">Click to upload an image</span>
+            <span className="text-sm text-gray-600">Upload up to 5 images</span>
             <input
               id="image-upload"
               type="file"
               accept="image/*"
+              multiple
               onChange={handleImageChange}
               className="hidden"
             />
           </label>
-          {imagePreview && (
-            <img
-              src={imagePreview}
-              alt="Preview"
-              className="mt-3 rounded-xl h-40 object-cover w-full border"
-            />
-          )}
+
+          <div className="grid grid-cols-2 gap-2 mt-3">
+            {imagePreviews.map((src, idx) => (
+              <div key={idx} className="relative group">
+                <img
+                  src={src}
+                  alt={`Preview ${idx}`}
+                  className="rounded-xl h-32 object-cover w-full border"
+                />
+                <button
+                  type="button"
+                  onClick={() => handleRemoveImage(idx)}
+                  className="absolute top-1 right-1 bg-red-600 text-white text-xs rounded-full px-1 opacity-0 group-hover:opacity-100 transition"
+                  title="Remove image"
+                >
+                  ×
+                </button>
+              </div>
+            ))}
+          </div>
         </div>
 
         <button
           type="submit"
           className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-xl mt-2"
+          disabled={loading}
         >
-          Submit
+          {loading ? "Creating..." : "Submit"}
         </button>
       </form>
     </div>

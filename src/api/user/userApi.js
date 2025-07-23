@@ -12,7 +12,7 @@ export const signupUser = async ({ name, email, password }) => {
     });
 
     const data = await res.json();
-
+    
     if (!res.ok) {
       throw data;
     }

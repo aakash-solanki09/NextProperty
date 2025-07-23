@@ -6,19 +6,20 @@ import Home from "./pages/Home";
 import About from "./pages/About";
 import Contact from "./pages/Contact";
 
-import Login from "./pages/auth/Login";
-import Signup from "./pages/auth/Signup";
-import Profile from "./pages/auth/Profile"; // ✅ New import
+
+import Profile from "./pages/auth/Profile";
 
 import CreateLand from "./pages/property/CreateLand";
-import AllLands from "./pages/property/AllLands";
 import UpdateLand from "./pages/property/UpdateLand";
-import AllPublicProperties from "./pages/property/AllPublicProperties";
+
+import ExplorePropertiesPage from "./pages/property/ExplorePropertiesPage";
 import PrivateRoute from "./components/PrivateRoute";
+import { AuthProvider } from "./api/context/AuthContext";
+import AuthPage from "../src/pages/AuthPage";
 
 function App() {
   return (
-    <>
+    <AuthProvider>
       <NavBar />
       <div className="pt-24 min-h-screen">
         <Routes>
@@ -26,8 +27,8 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/about" element={<About />} />
           <Route path="/contact" element={<Contact />} />
-          <Route path="/auth/login" element={<Login />} />
-          <Route path="/auth/signup" element={<Signup />} />
+          <Route path="/auth/login" element={<AuthPage />} />
+          <Route path="/auth/signup" element={<AuthPage />} />
 
           {/* Protected Routes */}
           <Route
@@ -38,14 +39,7 @@ function App() {
               </PrivateRoute>
             }
           />
-          <Route
-            path="/my-properties"
-            element={
-              <PrivateRoute>
-                <AllLands />
-              </PrivateRoute>
-            }
-          />
+
           <Route
             path="/update-property/:id"
             element={
@@ -58,10 +52,11 @@ function App() {
             path="/explore-properties"
             element={
               <PrivateRoute>
-                <AllPublicProperties />
+                <ExplorePropertiesPage />
               </PrivateRoute>
             }
           />
+
           <Route
             path="/auth/profile"
             element={
@@ -73,7 +68,7 @@ function App() {
         </Routes>
       </div>
       <Footer />
-    </>
+    </AuthProvider>
   );
 }
 

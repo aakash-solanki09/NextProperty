@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { getPropertyById, updateProperty } from "../../api/property/propertyApi";
-import { Upload } from "lucide-react"; // Make sure this package is installed
+import { Upload } from "lucide-react";
 
 const UpdateLand = () => {
   const { id } = useParams();
@@ -11,37 +11,41 @@ const UpdateLand = () => {
     title: "",
     description: "",
     typeOfProperty: "",
+    listingType: "",
     location: "",
-    price: "",
-    contactNumber: ""
+    price: ""
   });
-  const [image, setImage] = useState(null);
-  const [imagePreview, setImagePreview] = useState(null);
+
+  const [existingImages, setExistingImages] = useState([]);
+  const [newImages, setNewImages] = useState([]);
+  const [imagePreviews, setImagePreviews] = useState([]);
+  const [imagesToRemove, setImagesToRemove] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchProperty = async () => {
       try {
         const data = await getPropertyById(id);
         setFormData({
           title: data.title || "",
           description: data.description || "",
           typeOfProperty: data.typeOfProperty || "",
+          listingType: data.listingType || "",
           location: data.location || "",
-          price: data.price || "",
-          contactNumber: data.contactNumber || ""
+          price: data.price || ""
         });
-        if (data.image) {
-          setImagePreview(data.image);
+        if (Array.isArray(data.images)) {
+          setExistingImages(data.images);
         }
       } catch (err) {
-        setError("Failed to load property");
+        setError("Failed to load property.");
       } finally {
         setLoading(false);
       }
     };
-    fetchData();
+    fetchProperty();
   }, [id]);
 
   const handleChange = (e) => {
@@ -52,28 +56,51 @@ const UpdateLand = () => {
   };
 
   const handleImageChange = (e) => {
-    const file = e.target.files[0];
-    setImage(file);
-    if (file) {
-      setImagePreview(URL.createObjectURL(file));
-    }
+    const files = Array.from(e.target.files).slice(0, 5);
+    setNewImages(files);
+    setImagePreviews(files.map((file) => URL.createObjectURL(file)));
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      const data = new FormData();
-      Object.entries(formData).forEach(([key, value]) => {
-        data.append(key, value);
-      });
-      if (image) data.append("image", image);
-
-      await updateProperty(id, data);
-      navigate("/my-properties");
-    } catch (err) {
-      setError("Update failed. Please try again.");
-    }
+  const handleRemoveExistingImage = (url) => {
+    setExistingImages((prev) => prev.filter((img) => img !== url));
+    setImagesToRemove((prev) => [...prev, url]);
   };
+
+ const handleSubmit = async (e) => {
+  e.preventDefault();
+  setError(null);
+
+  const { title, description, typeOfProperty, listingType, location, price } = formData;
+  if (!title || !description || !typeOfProperty || !listingType || !location || !price) {
+    setError("Please fill in all fields.");
+    return;
+  }
+
+  try {
+    setSubmitting(true);
+
+    const data = new FormData();
+    Object.entries(formData).forEach(([key, value]) => {
+      data.append(key, value);
+    });
+
+ 
+    newImages.forEach((file) => data.append("images", file));
+
+   
+    imagesToRemove.forEach((url) => data.append("imagesToRemove", url));
+
+    
+    existingImages.forEach((url) => data.append("existingImages", url));
+
+    await updateProperty(id, data);
+   navigate("/explore-properties");
+  } catch (err) {
+    setError("Update failed. Please try again.");
+  } finally {
+    setSubmitting(false);
+  }
+};
 
   if (loading) return <p className="text-center mt-10">Loading...</p>;
 
@@ -82,9 +109,8 @@ const UpdateLand = () => {
 
   return (
     <div className="relative max-w-2xl mx-auto bg-white shadow-xl p-6 mt-6 rounded-2xl">
-      {/* Top Right Close Button */}
       <button
-        onClick={() => navigate("/my-properties")}
+        onClick={() => navigate("/explore-properties")}
         className="absolute top-3 right-4 text-gray-500 hover:text-black text-xl font-bold"
       >
         ×
@@ -128,6 +154,18 @@ const UpdateLand = () => {
           <option value="Shops Showrooms">Shops Showrooms</option>
         </select>
 
+        {/* Listing Type */}
+        <select
+          name="listingType"
+          className={inputStyle}
+          value={formData.listingType}
+          onChange={handleChange}
+        >
+          <option value="">Select Listing Type</option>
+          <option value="Sell">Sell</option>
+          <option value="Rent">Rent</option>
+        </select>
+
         <input
           type="text"
           name="location"
@@ -144,44 +182,68 @@ const UpdateLand = () => {
           value={formData.price}
           onChange={handleChange}
         />
-        <input
-          type="text"
-          name="contactNumber"
-          placeholder="Contact Number"
-          className={inputStyle}
-          value={formData.contactNumber}
-          onChange={handleChange}
-        />
 
-        {/* Updated Image Upload UI */}
         <div className="relative">
           <label
             htmlFor="image-upload"
             className="flex flex-col items-center justify-center border-2 border-dashed border-gray-400 rounded-xl p-4 cursor-pointer hover:border-blue-500 transition"
           >
             <Upload className="w-6 h-6 text-blue-600 mb-2" />
-            <span className="text-sm text-gray-600">Click to upload an image</span>
+            <span className="text-sm text-gray-600">
+              Upload up to 5 new images (optional)
+            </span>
             <input
               id="image-upload"
               type="file"
               accept="image/*"
+              multiple
               onChange={handleImageChange}
               className="hidden"
             />
           </label>
-          {imagePreview && (
-            <img
-              src={imagePreview}
-              alt="Preview"
-              className="mt-3 rounded-xl h-40 object-cover w-full border"
-            />
+
+          {/* New image previews */}
+          {imagePreviews.length > 0 && (
+            <div className="grid grid-cols-2 gap-2 mt-3">
+              {imagePreviews.map((src, idx) => (
+                <img
+                  key={idx}
+                  src={src}
+                  alt={`New Preview ${idx}`}
+                  className="rounded-xl h-32 object-cover w-full border"
+                />
+              ))}
+            </div>
+          )}
+
+          {/* Existing image previews with remove option */}
+          {imagePreviews.length === 0 && existingImages.length > 0 && (
+            <div className="grid grid-cols-2 gap-2 mt-3">
+              {existingImages.map((url, idx) => (
+                <div key={idx} className="relative group">
+                  <img
+                    src={url}
+                    alt={`Existing ${idx}`}
+                    className="rounded-xl h-32 object-cover w-full border"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => handleRemoveExistingImage(url)}
+                    className="absolute top-1 right-1 bg-red-600 text-white text-xs rounded-full px-1 opacity-0 group-hover:opacity-100 transition"
+                    title="Remove image"
+                  >
+                    ×
+                  </button>
+                </div>
+              ))}
+            </div>
           )}
         </div>
 
         <div className="flex justify-between mt-3">
           <button
             type="button"
-            onClick={() => navigate("/my-properties")}
+            onClick={() => navigate("/explore-properties")}
             className="bg-gray-300 hover:bg-gray-400 text-black py-2 px-4 rounded-xl"
           >
             Cancel
@@ -189,8 +251,9 @@ const UpdateLand = () => {
           <button
             type="submit"
             className="bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-xl"
+            disabled={submitting}
           >
-            Update
+            {submitting ? "Updating..." : "Update"}
           </button>
         </div>
       </form>
