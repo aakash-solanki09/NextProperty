@@ -13,7 +13,11 @@ const UpdateLand = () => {
     typeOfProperty: "",
     listingType: "",
     location: "",
-    price: ""
+    price: "",
+    bhk: "",
+    area: "",
+    carpetArea: "",
+    buildUpArea: "",
   });
 
   const [existingImages, setExistingImages] = useState([]);
@@ -34,7 +38,11 @@ const UpdateLand = () => {
           typeOfProperty: data.typeOfProperty || "",
           listingType: data.listingType || "",
           location: data.location || "",
-          price: data.price || ""
+          price: data.price || "",
+          bhk: data.bhk || "",
+          area: data.area || "",
+          carpetArea: data.carpetArea || "",
+          buildUpArea: data.buildUpArea || "",
         });
         if (Array.isArray(data.images)) {
           setExistingImages(data.images);
@@ -66,41 +74,48 @@ const UpdateLand = () => {
     setImagesToRemove((prev) => [...prev, url]);
   };
 
- const handleSubmit = async (e) => {
-  e.preventDefault();
-  setError(null);
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError(null);
 
-  const { title, description, typeOfProperty, listingType, location, price } = formData;
-  if (!title || !description || !typeOfProperty || !listingType || !location || !price) {
-    setError("Please fill in all fields.");
-    return;
-  }
+    const { title, description, typeOfProperty, listingType, location, price } = formData;
+    if (!title || !description || !typeOfProperty || !listingType || !location || !price) {
+      setError("Please fill in all required fields.");
+      return;
+    }
 
-  try {
-    setSubmitting(true);
+    try {
+      setSubmitting(true);
+      const data = new FormData();
 
-    const data = new FormData();
-    Object.entries(formData).forEach(([key, value]) => {
-      data.append(key, value);
-    });
+      // Always required
+      data.append("title", title);
+      data.append("description", description);
+      data.append("typeOfProperty", typeOfProperty);
+      data.append("listingType", listingType);
+      data.append("location", location);
+      data.append("price", price);
 
- 
-    newImages.forEach((file) => data.append("images", file));
+      // Conditionally append
+      if (formData.bhk) data.append("bhk", formData.bhk);
+      if (formData.area) data.append("area", formData.area);
+      if (listingType === "Sell") {
+        if (formData.carpetArea) data.append("carpetArea", formData.carpetArea);
+        if (formData.buildUpArea) data.append("buildUpArea", formData.buildUpArea);
+      }
 
-   
-    imagesToRemove.forEach((url) => data.append("imagesToRemove", url));
+      newImages.forEach((file) => data.append("images", file));
+      imagesToRemove.forEach((url) => data.append("imagesToRemove", url));
+      existingImages.forEach((url) => data.append("existingImages", url));
 
-    
-    existingImages.forEach((url) => data.append("existingImages", url));
-
-    await updateProperty(id, data);
-   navigate("/explore-properties");
-  } catch (err) {
-    setError("Update failed. Please try again.");
-  } finally {
-    setSubmitting(false);
-  }
-};
+      await updateProperty(id, data);
+      navigate("/explore-properties");
+    } catch (err) {
+      setError("Update failed. Please try again.");
+    } finally {
+      setSubmitting(false);
+    }
+  };
 
   if (loading) return <p className="text-center mt-10">Loading...</p>;
 
@@ -135,6 +150,7 @@ const UpdateLand = () => {
           value={formData.description}
           onChange={handleChange}
         />
+
         <select
           name="typeOfProperty"
           className={inputStyle}
@@ -154,7 +170,6 @@ const UpdateLand = () => {
           <option value="Shops Showrooms">Shops Showrooms</option>
         </select>
 
-        {/* Listing Type */}
         <select
           name="listingType"
           className={inputStyle}
@@ -165,6 +180,48 @@ const UpdateLand = () => {
           <option value="Sell">Sell</option>
           <option value="Rent">Rent</option>
         </select>
+
+        {(formData.listingType === "Rent" || formData.listingType === "Sell") && (
+          <>
+            <input
+              type="number"
+              name="bhk"
+              placeholder="BHK (optional)"
+              className={inputStyle}
+              value={formData.bhk}
+              onChange={handleChange}
+            />
+            <input
+              type="text"
+              name="area"
+              placeholder="Area (e.g. 1200 sqft)"
+              className={inputStyle}
+              value={formData.area}
+              onChange={handleChange}
+            />
+          </>
+        )}
+
+        {formData.listingType === "Sell" && (
+          <>
+            <input
+              type="text"
+              name="carpetArea"
+              placeholder="Carpet Area (optional)"
+              className={inputStyle}
+              value={formData.carpetArea}
+              onChange={handleChange}
+            />
+            <input
+              type="text"
+              name="buildUpArea"
+              placeholder="Built-up Area (optional)"
+              className={inputStyle}
+              value={formData.buildUpArea}
+              onChange={handleChange}
+            />
+          </>
+        )}
 
         <input
           type="text"
@@ -202,7 +259,6 @@ const UpdateLand = () => {
             />
           </label>
 
-          {/* New image previews */}
           {imagePreviews.length > 0 && (
             <div className="grid grid-cols-2 gap-2 mt-3">
               {imagePreviews.map((src, idx) => (
@@ -216,7 +272,6 @@ const UpdateLand = () => {
             </div>
           )}
 
-          {/* Existing image previews with remove option */}
           {imagePreviews.length === 0 && existingImages.length > 0 && (
             <div className="grid grid-cols-2 gap-2 mt-3">
               {existingImages.map((url, idx) => (

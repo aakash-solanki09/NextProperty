@@ -12,7 +12,11 @@ const CreateLand = () => {
     typeOfProperty: "",
     listingType: "",
     location: "",
-    price: ""
+    price: "",
+    bhk: "",
+    area: "",
+    carpetArea: "",
+    buildUpArea: ""
   });
 
   const [images, setImages] = useState([]);
@@ -42,7 +46,7 @@ const CreateLand = () => {
     const newImages = [...images];
     newImages.splice(index, 1);
     setImages(newImages);
-    setImagePreviews(newImages.map(file => URL.createObjectURL(file)));
+    setImagePreviews(newImages.map((file) => URL.createObjectURL(file)));
   };
 
   const handleSubmit = async (e) => {
@@ -52,7 +56,7 @@ const CreateLand = () => {
 
     const { title, description, typeOfProperty, listingType, location, price } = formData;
     if (!title || !description || !typeOfProperty || !listingType || !location || !price) {
-      setError("Please fill in all fields.");
+      setError("Please fill in all required fields.");
       return;
     }
 
@@ -61,7 +65,7 @@ const CreateLand = () => {
 
       const data = new FormData();
       Object.entries(formData).forEach(([key, value]) => {
-        data.append(key, value);
+        if (value !== "") data.append(key, value);
       });
       images.forEach((file) => data.append("images", file));
 
@@ -80,7 +84,7 @@ const CreateLand = () => {
 
   return (
     <div className="max-w-2xl mx-auto bg-white shadow-xl p-6 mt-6 rounded-2xl">
-      <h2 className="text-xl font-semibold mb-4">Create Property</h2>
+      <h2 className="text-xl font-semibold mb-4">Add Property</h2>
       {error && <p className="text-red-500 mb-3">{error}</p>}
       {success && <p className="text-green-600 mb-3">{success}</p>}
 
@@ -131,6 +135,49 @@ const CreateLand = () => {
           <option value="rent">For Rent</option>
         </select>
 
+        {/* Dynamic Fields */}
+        {(formData.listingType === "rent" || formData.listingType === "sale") && (
+          <>
+            <input
+              type="number"
+              name="bhk"
+              placeholder="BHK"
+              className={inputStyle}
+              value={formData.bhk}
+              onChange={handleChange}
+            />
+            <input
+              type="number"
+              name="area"
+              placeholder="Area (sq ft)"
+              className={inputStyle}
+              value={formData.area}
+              onChange={handleChange}
+            />
+          </>
+        )}
+
+        {formData.listingType === "sale" && (
+          <>
+            <input
+              type="number"
+              name="carpetArea"
+              placeholder="Carpet Area (sq ft)"
+              className={inputStyle}
+              value={formData.carpetArea}
+              onChange={handleChange}
+            />
+            <input
+              type="number"
+              name="buildUpArea"
+              placeholder="Build-Up Area (sq ft)"
+              className={inputStyle}
+              value={formData.buildUpArea}
+              onChange={handleChange}
+            />
+          </>
+        )}
+
         <input
           type="text"
           name="location"
@@ -148,7 +195,7 @@ const CreateLand = () => {
           onChange={handleChange}
         />
 
-        {/* Multi-image upload with preview and remove */}
+        {/* Image Upload */}
         <div className="relative">
           <label
             htmlFor="image-upload"

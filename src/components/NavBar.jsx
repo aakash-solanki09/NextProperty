@@ -83,7 +83,7 @@ export default function NavBar() {
               location.pathname === "/create-property" ? "border-gray-400 text-gray-300" : "border-transparent hover:text-white"
             }`}
           >
-            Create Property
+           Add Property
           </Link>
 
           <button

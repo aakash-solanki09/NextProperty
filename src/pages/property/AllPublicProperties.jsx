@@ -1,18 +1,26 @@
 import React, { useEffect, useState } from "react";
 import { getAllPublicProperties } from "../../api/property/propertyApi";
+import dayjs from "dayjs";
+import relativeTime from "dayjs/plugin/relativeTime";
+
+dayjs.extend(relativeTime);
 
 const AllPublicProperties = () => {
   const [properties, setProperties] = useState([]);
   const [filteredProperties, setFilteredProperties] = useState([]);
   const [search, setSearch] = useState("");
   const [typeFilter, setTypeFilter] = useState("");
+  const [listingFilter, setListingFilter] = useState("");
   const [priceRange, setPriceRange] = useState("");
-  const [listingTypeFilter, setListingTypeFilter] = useState("");
+  const [sortOrder, setSortOrder] = useState("");
+  const [activeFilters, setActiveFilters] = useState([]);
   const [imageIndexMap, setImageIndexMap] = useState({});
   const [showAlert, setShowAlert] = useState(false);
   const [alertMessage, setAlertMessage] = useState("");
   const [modalImageIndex, setModalImageIndex] = useState(0);
-  const [selectedProperty, setSelectedProperty] = useState(null); // For modal
+  const [selectedProperty, setSelectedProperty] = useState(null);
+  const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -20,7 +28,6 @@ const AllPublicProperties = () => {
         const data = await getAllPublicProperties();
         setProperties(data);
         setFilteredProperties(data);
-
         const indexMap = {};
         data.forEach((p) => (indexMap[p._id] = 0));
         setImageIndexMap(indexMap);
@@ -49,21 +56,57 @@ const AllPublicProperties = () => {
       filtered = filtered.filter((p) => p.typeOfProperty === typeFilter);
     }
 
+    if (listingFilter) {
+      filtered = filtered.filter(
+        (p) => (p.listingType || "").trim().toLowerCase() === listingFilter.toLowerCase()
+      );
+    }
+
     if (priceRange) {
       const [min, max] = priceRange.split("-").map(Number);
       filtered = filtered.filter((p) => p.price >= min && p.price <= max);
     }
 
-    if (listingTypeFilter) {
-      filtered = filtered.filter(
-        (p) =>
-          (p.listingType || "").trim().toLowerCase() ===
-          listingTypeFilter.toLowerCase()
-      );
+    if (sortOrder === "newest") {
+      filtered = [...filtered].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+    } else if (sortOrder === "oldest") {
+      filtered = [...filtered].sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
     }
 
     setFilteredProperties(filtered);
-  }, [search, typeFilter, priceRange, listingTypeFilter, properties]);
+  }, [search, typeFilter, listingFilter, priceRange, sortOrder, properties]);
+
+  useEffect(() => {
+    // Simple user agent check for mobile
+    const checkMobile = () => {
+      const ua = navigator.userAgent;
+      setIsMobile(/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(ua));
+    };
+    checkMobile();
+  }, []);
+
+  const phoneNumber = "1234567890";
+
+  const handleSubFilterChange = (type, value) => {
+    if (type === "type") setTypeFilter(value);
+    else if (type === "listing") setListingFilter(value);
+    else if (type === "price") setPriceRange(value);
+    else if (type === "sort") setSortOrder(value);
+
+    if (!activeFilters.some((f) => f.type === type)) {
+      setActiveFilters((prev) => [...prev, { type, value }]);
+    } else {
+      setActiveFilters((prev) => prev.map((f) => (f.type === type ? { type, value } : f)));
+    }
+  };
+
+  const removeFilter = (type) => {
+    if (type === "type") setTypeFilter("");
+    if (type === "listing") setListingFilter("");
+    if (type === "price") setPriceRange("");
+    if (type === "sort") setSortOrder("");
+    setActiveFilters((prev) => prev.filter((f) => f.type !== type));
+  };
 
   const handleNextImage = (id, imagesLength) => {
     setImageIndexMap((prev) => ({
@@ -84,63 +127,141 @@ const AllPublicProperties = () => {
     setShowAlert(true);
   };
 
+  const handleCallClick = (e) => {
+    e.stopPropagation();
+    if (isMobile) {
+      window.location.href = `tel:${phoneNumber}`;
+    } else {
+      showCustomAlert(phoneNumber);
+    }
+  };
+
   return (
-    <div className="max-w-7xl mx-auto mt-6 px-4">
-      <h2 className="text-2xl font-bold mb-4 text-center">Explore All Properties</h2>
-
-      {/* Filters */}
-      <div className="flex flex-col sm:flex-row flex-wrap justify-between items-center gap-4 mb-6">
-        <input
-          type="text"
-          placeholder="Search by title, location, price..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className="w-full sm:w-1/2 border border-gray-300 rounded-md px-3 py-2"
-        />
-        <div className="flex flex-wrap gap-3 w-full sm:w-auto">
-          <select
-            value={typeFilter}
-            onChange={(e) => setTypeFilter(e.target.value)}
-            className="border border-gray-300 rounded-md px-3 py-2"
-          >
-            <option value="">All Types</option>
-            <option value="Flats">Flats</option>
-            <option value="Builder Floors">Builder Floors</option>
-            <option value="House Villas">House Villas</option>
-            <option value="Plots">Plots</option>
-            <option value="Farmhouses">Farmhouses</option>
-            <option value="Hotels">Hotels</option>
-            <option value="Lands">Lands</option>
-            <option value="Office Spaces">Office Spaces</option>
-            <option value="Hostels">Hostels</option>
-            <option value="Shops Showrooms">Shops Showrooms</option>
-          </select>
-
-          <select
-            value={priceRange}
-            onChange={(e) => setPriceRange(e.target.value)}
-            className="border border-gray-300 rounded-md px-3 py-2"
-          >
-            <option value="">Any Price</option>
-            <option value="0-500000">Below ₹5 Lakh</option>
-            <option value="500001-1000000">₹5L–₹10L</option>
-            <option value="1000001-5000000">₹10L–₹50L</option>
-            <option value="5000001-10000000">₹50L–₹1Cr</option>
-            <option value="10000001-100000000">₹1Cr+</option>
-          </select>
-
-          <select
-            value={listingTypeFilter}
-            onChange={(e) => setListingTypeFilter(e.target.value)}
-            className="border border-gray-300 rounded-md px-3 py-2"
-          >
-            <option value="">All Listing Types</option>
-            <option value="sale">For Sale</option>
-            <option value="rent">For Rent</option>
-          </select>
+    <>
+      {/* Hero Section with BG Image - full viewport width */}
+      <div
+        className="w-screen relative flex flex-col items-center justify-center mb-10"
+        style={{
+          position: 'relative',
+          left: '50%',
+          right: '50%',
+          marginLeft: '-50vw',
+          marginRight: '-50vw',
+          width: '100vw',
+          height: '70vh',
+          minHeight: 350,
+          backgroundImage: `url('/src/assets/pexels-thelazyartist-1642125.jpg')`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          // borderRadius removed for square corners
+          overflow: 'hidden',
+        }}
+      >
+        <div className="absolute inset-0 bg-black bg-opacity-50" />
+        <div className="relative z-10 flex flex-col items-center justify-center h-full w-full px-4">
+          <h1 className="text-4xl md:text-5xl font-extrabold text-white text-center mb-3 drop-shadow-lg">Find Your Dream Property</h1>
+          <p className="text-lg md:text-2xl text-white text-center mb-8 drop-shadow-lg">Browse the best properties for sale and rent in your city</p>
+          {/* Filters/Search Bar in Hero */}
+          <div className="w-full max-w-3xl bg-opacity-90 rounded-xl  p-4 flex flex-col sm:flex-row gap-4 items-center justify-center">
+            <input
+              type="text"
+              placeholder="Search..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="w-full sm:w-[40%] border border-gray-300 rounded-md px-3 py-2"
+            />
+            <select
+              value={sortOrder}
+              onChange={(e) => handleSubFilterChange('sort', e.target.value)}
+              className="border border-gray-300 rounded-md px-3 py-2"
+            >
+              <option value="">Sort By</option>
+              <option value="newest">Newest</option>
+              <option value="oldest">Oldest</option>
+            </select>
+            <div className="relative w-full sm:w-auto">
+              <button
+                onClick={() => setShowAdvancedFilters(!showAdvancedFilters)}
+                className="border border-gray-300 rounded-md px-3 py-2 w-full bg-white"
+              >
+                More Filters
+              </button>
+              {showAdvancedFilters && (
+                <div className="absolute z-20 mt-2 bg-white border rounded-md p-4 w-64 shadow-md left-0">
+                  <label className="block text-sm mb-2">
+                    Type:
+                    <select
+                      value={typeFilter}
+                      onChange={(e) => handleSubFilterChange('type', e.target.value)}
+                      className="w-full mt-1 border px-2 py-1"
+                    >
+                      <option value="">Select Type</option>
+                      <option value="Flats">Flats</option>
+                      <option value="Builder Floors">Builder Floors</option>
+                      <option value="House Villas">House Villas</option>
+                      <option value="Plots">Plots</option>
+                      <option value="Farmhouses">Farmhouses</option>
+                      <option value="Hotels">Hotels</option>
+                      <option value="Lands">Lands</option>
+                      <option value="Office Spaces">Office Spaces</option>
+                      <option value="Hostels">Hostels</option>
+                      <option value="Shops Showrooms">Shops Showrooms</option>
+                    </select>
+                  </label>
+                  <label className="block text-sm mb-2">
+                    Listing:
+                    <select
+                      value={listingFilter}
+                      onChange={(e) => handleSubFilterChange('listing', e.target.value)}
+                      className="w-full mt-1 border px-2 py-1"
+                    >
+                      <option value="">Select Listing</option>
+                      <option value="sale">For Sale</option>
+                      <option value="rent">For Rent</option>
+                    </select>
+                  </label>
+                  <label className="block text-sm">
+                    Price Range:
+                    <select
+                      value={priceRange}
+                      onChange={(e) => handleSubFilterChange('price', e.target.value)}
+                      className="w-full mt-1 border px-2 py-1"
+                    >
+                      <option value="">Select Price</option>
+                      <option value="0-500000">Below ₹5L</option>
+                      <option value="500001-1000000">₹5L–₹10L</option>
+                      <option value="1000001-5000000">₹10L–₹50L</option>
+                      <option value="5000001-10000000">₹50L–₹1Cr</option>
+                      <option value="10000001-100000000">₹1Cr+</option>
+                    </select>
+                  </label>
+                </div>
+              )}
+            </div>
+          </div>
+          {/* Active Filters below search/filter bar */}
+          {activeFilters.length > 0 && (
+            <div className="flex flex-wrap gap-2 mt-4">
+              {activeFilters.map((f, idx) => (
+                <div
+                  key={idx}
+                  className="bg-blue-100 text-blue-700 px-3 py-1 rounded-full flex items-center gap-2 text-sm"
+                >
+                  {f.type.charAt(0).toUpperCase() + f.type.slice(1)}: {f.value}
+                  <button
+                    onClick={() => removeFilter(f.type)}
+                    className="text-blue-800 font-bold hover:text-red-600"
+                  >
+                    ×
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </div>
 
+      <div className="max-w-7xl mx-auto px-4">
       {/* Properties Grid */}
       <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
         {filteredProperties.map((property) => {
@@ -152,13 +273,14 @@ const AllPublicProperties = () => {
             <div
               key={property._id}
               onClick={() => setSelectedProperty(property)}
-              className="bg-white shadow-md rounded-xl overflow-hidden text-sm cursor-pointer hover:shadow-lg transition"
+              className="bg-white shadow-lg rounded-2xl overflow-hidden text-sm cursor-pointer hover:shadow-2xl transition border border-gray-100 group"
+              style={{ minHeight: 340 }}
             >
-              <div className="relative h-40 overflow-hidden">
+              <div className="relative h-56 overflow-hidden">
                 <img
                   src={currentImage}
                   alt={property.title}
-                  className="h-full w-full object-cover transition-all"
+                  className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
                 />
                 {images.length > 1 && (
                   <div className="absolute inset-0 flex justify-between items-center px-2">
@@ -167,7 +289,7 @@ const AllPublicProperties = () => {
                         e.stopPropagation();
                         handlePrevImage(property._id, images.length);
                       }}
-                      className="bg-black bg-opacity-40 text-white text-sm rounded-full w-7 h-7"
+                      className="bg-white bg-opacity-70 text-gray-700 text-lg rounded-full w-8 h-8 flex items-center justify-center shadow hover:bg-opacity-100"
                     >
                       ‹
                     </button>
@@ -176,35 +298,35 @@ const AllPublicProperties = () => {
                         e.stopPropagation();
                         handleNextImage(property._id, images.length);
                       }}
-                      className="bg-black bg-opacity-40 text-white text-sm rounded-full w-7 h-7"
+                      className="bg-white bg-opacity-70 text-gray-700 text-lg rounded-full w-8 h-8 flex items-center justify-center shadow hover:bg-opacity-100"
                     >
                       ›
                     </button>
                   </div>
                 )}
+                {property.listingType && (
+                  <span className={`absolute top-3 left-3 px-3 py-1 rounded-full text-xs font-semibold shadow ${property.listingType.toLowerCase() === 'sale' ? 'bg-green-100 text-green-700' : 'bg-blue-100 text-blue-700'}`}
+                  >
+                    {property.listingType.charAt(0).toUpperCase() + property.listingType.slice(1)}
+                  </span>
+                )}
               </div>
 
-              <div className="p-3">
-                <h3 className="text-lg font-semibold truncate">{property.title}</h3>
-                <p className="text-gray-600 h-12 overflow-hidden text-ellipsis">
-                  {property.description}
-                </p>
-                <p className="text-blue-500 font-bold mt-1">₹{property.price}</p>
-                <p className="text-xs text-gray-400">{property.location}</p>
-                <p className="text-xs text-gray-600 italic mt-1">
-                  Listing Type:{" "}
-                  <span className="font-semibold">
-                    {(property.listingType || "N/A").charAt(0).toUpperCase() +
-                      (property.listingType || "N/A").slice(1).toLowerCase()}
-                  </span>
-                </p>
-                <div className="mt-3 flex justify-end space-x-2">
+              <div className="p-4 flex flex-col gap-2">
+                <div className="flex items-center justify-between mb-1">
+                  <h3 className="text-lg font-bold truncate text-gray-900" title={property.title}>{property.title}</h3>
+                  <span className="text-blue-600 font-extrabold text-lg">₹{property.price.toLocaleString()}</span>
+                </div>
+                <p className="text-gray-500 text-xs mb-1 truncate font-semibold" title={property.location}><span className="font-semibold">{property.location}</span></p>
+                <div className="flex items-center gap-3 mb-1">
+                  <span className="inline-block bg-gray-100 text-gray-700 px-2 py-0.5 rounded text-xs font-medium">{property.bhk} BHK</span>
+                  <span className="inline-block bg-gray-100 text-gray-700 px-2 py-0.5 rounded text-xs font-medium">{property.area} sq.ft</span>
+                </div>
+                <p className="text-gray-700 text-sm line-clamp-2 min-h-[2.5em]">{property.description}</p>
+                <div className="flex justify-end mt-2">
                   <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      showCustomAlert("For more details, call us at: 1234567890");
-                    }}
-                    className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-xs"
+                    onClick={handleCallClick}
+                    className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-1.5 rounded-lg text-xs font-semibold shadow"
                   >
                     Call
                   </button>
@@ -216,26 +338,36 @@ const AllPublicProperties = () => {
       </div>
 
       {/* Custom Alert */}
-      {showAlert && (
+      {showAlert && !isMobile && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
           <div className="bg-white border border-blue-600 rounded-lg p-6 max-w-sm w-full shadow-xl text-center">
             <h2 className="text-lg font-semibold text-black mb-2">📞 Contact Info</h2>
-            <p className="text-sm text-gray-700 mb-4">{alertMessage}</p>
-            <button
-              onClick={() => setShowAlert(false)}
-              className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded"
-            >
-              Close
-            </button>
+            <p className="text-sm text-gray-700 mb-4">Call us at: <span className="font-bold">{alertMessage}</span></p>
+            <div className="flex justify-center gap-3">
+              <button
+                onClick={() => {
+                  navigator.clipboard.writeText(alertMessage);
+                }}
+                className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded font-semibold"
+              >
+                Copy
+              </button>
+              <button
+                onClick={() => setShowAlert(false)}
+                className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded"
+              >
+                Close
+              </button>
+            </div>
           </div>
         </div>
       )}
 
      {selectedProperty && (
   <div className="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center p-4">
-    <div className="bg-white w-full max-w-5xl rounded-xl shadow-lg overflow-y-auto max-h-[90vh] relative flex flex-col lg:flex-row">
+    <div className="bg-white w-full max-w-5xl rounded-2xl shadow-2xl overflow-y-auto max-h-[90vh] relative flex flex-col lg:flex-row">
       <button
-        className="absolute top-2 right-2 text-black text-2xl font-bold z-10"
+        className="absolute top-2 right-2 text-black text-2xl font-bold z-10 hover:text-red-600"
         onClick={() => {
           setSelectedProperty(null);
           setModalImageIndex(0); // reset image index on close
@@ -245,14 +377,14 @@ const AllPublicProperties = () => {
       </button>
 
       {/* Image Section with Arrows */}
-      <div className="w-full lg:w-[45%] h-64 lg:h-auto relative flex items-center justify-center">
+      <div className="w-full lg:w-[45%] h-72 lg:h-auto relative flex items-center justify-center bg-gray-50 rounded-t-2xl lg:rounded-l-2xl lg:rounded-tr-none">
         <img
           src={
             selectedProperty.images?.[modalImageIndex] ||
             selectedProperty.imageUrl
           }
           alt={selectedProperty.title}
-          className="w-full h-full object-cover rounded-t-xl lg:rounded-l-xl lg:rounded-tr-none"
+          className="w-full h-full object-cover rounded-t-2xl lg:rounded-l-2xl lg:rounded-tr-none"
         />
         {/* Left arrow */}
         {selectedProperty.images?.length > 1 && (
@@ -265,7 +397,7 @@ const AllPublicProperties = () => {
                   selectedProperty.images.length
                 );
               }}
-              className="absolute left-2 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-40 text-white text-lg rounded-full w-8 h-8 flex items-center justify-center"
+              className="absolute left-2 top-1/2 transform -translate-y-1/2 bg-white bg-opacity-80 text-gray-700 text-lg rounded-full w-8 h-8 flex items-center justify-center shadow hover:bg-opacity-100"
             >
               ‹
             </button>
@@ -278,7 +410,7 @@ const AllPublicProperties = () => {
                   (prev + 1) % selectedProperty.images.length
                 );
               }}
-              className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-40 text-white text-lg rounded-full w-8 h-8 flex items-center justify-center"
+              className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-white bg-opacity-80 text-gray-700 text-lg rounded-full w-8 h-8 flex items-center justify-center shadow hover:bg-opacity-100"
             >
               ›
             </button>
@@ -287,17 +419,30 @@ const AllPublicProperties = () => {
       </div>
 
       {/* Content Section */}
-      <div className="w-full lg:w-[55%]  p-5">
-        <h2 className="text-2xl font-semibold mb-2">{selectedProperty.title}</h2>
-        <p className="text-gray-600 mb-2">{selectedProperty.description}</p>
-        <p className="font-bold text-xl text-blue-600 mb-2">₹{selectedProperty.price}</p>
-        <p className="text-gray-500 mb-1"> {selectedProperty.location}</p>
-        <p className="text-sm text-gray-700">
-          <strong>Type:</strong> {selectedProperty.typeOfProperty}
-        </p>
-        <p className="text-sm text-gray-700">
-          <strong>Listing:</strong> {selectedProperty.listingType}
-        </p>
+      <div className="w-full lg:w-[55%] p-6 flex flex-col gap-2">
+        <div className="flex items-center justify-between mb-2">
+          <h2 className="text-2xl font-bold text-gray-900 mb-0">{selectedProperty.title}</h2>
+          <span className="text-blue-600 font-extrabold text-xl">₹{selectedProperty.price?.toLocaleString()}</span>
+        </div>
+        <p className="text-gray-500 text-sm font-semibold mb-1">{selectedProperty.location}</p>
+        <p className="text-gray-700 mb-2 text-base">{selectedProperty.description}</p>
+        <div className="flex flex-wrap gap-3 mb-2">
+          <span className="inline-block bg-gray-100 text-gray-700 px-3 py-1 rounded text-xs font-medium">BHK: {selectedProperty.bhk}</span>
+          <span className="inline-block bg-gray-100 text-gray-700 px-3 py-1 rounded text-xs font-medium">Area: {selectedProperty.area} sq.ft</span>
+          <span className="inline-block bg-gray-100 text-gray-700 px-3 py-1 rounded text-xs font-medium">Type: {selectedProperty.typeOfProperty}</span>
+          <span className="font-medium text-gray-700"></span>
+          <span className={`inline-block px-3 py-1 rounded text-xs font-semibold shadow ${selectedProperty.listingType?.toLowerCase() === 'sale' ? 'bg-green-100 text-green-700' : 'bg-blue-100 text-blue-700'}`}>{selectedProperty.listingType}</span>
+        </div>
+        {selectedProperty.listingType?.toLowerCase() === 'sale' && (
+          <div className="flex flex-wrap gap-3 mb-2">
+            <span className="inline-block bg-gray-50 text-gray-800 px-3 py-1 rounded text-xs font-medium border">Build Up Area: {selectedProperty.buildUpArea} sq.ft</span>
+            <span className="inline-block bg-gray-50 text-gray-800 px-3 py-1 rounded text-xs font-medium border">Carpet Area: {selectedProperty.carpetArea} sq.ft</span>
+          </div>
+        )}
+        <div className="flex flex-wrap gap-3 mb-2">
+
+          <span className="inline-block bg-gray-50 text-gray-800 px-3 py-1 rounded text-xs font-medium border">Posted: {dayjs(selectedProperty.createdAt).format('DD MMM YYYY')}</span>
+        </div>
       </div>
     </div>
   </div>
@@ -305,6 +450,7 @@ const AllPublicProperties = () => {
 
 
     </div>
+    </>
   );
 };
 

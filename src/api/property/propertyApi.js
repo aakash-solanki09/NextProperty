@@ -15,9 +15,6 @@ export const createProperty = async (formData) => {
 
     const response = await fetch(`${BASE_URL}/properties`, {
       method: "POST",
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
       body: formData, 
     });
 
@@ -26,7 +23,7 @@ export const createProperty = async (formData) => {
     if (!response.ok) {
       throw new Error(data.message || "Failed to create property");
     }
-
+    
     return data;
   } catch (error) {
     console.error("Property creation error:", error);
