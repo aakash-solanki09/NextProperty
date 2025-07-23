@@ -48,7 +48,7 @@
     return (
       <div className="min-h-screen bg-white text-gray-800 font-urbanist">
         <div className="min-h-screen px-4 sm:px-8 py-24">
-          {/* Hero Section */}
+          {/* Hero Section  hero section*/}
           <section className="text-center mb-16">
             <h1 className="text-4xl sm:text-5xl font-bold mb-4">
               Welcome to NextProperty
