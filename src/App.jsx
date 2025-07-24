@@ -18,7 +18,7 @@ function App() {
   return (
    <>
       <NavBar />
-      <div className="pt-24 min-h-screen">
+      <div className="pt-16 min-h-screen">
         <Routes>
           {/* Public Routes */}
           <Route path="/" element={ <AllPublicProperties/>} />

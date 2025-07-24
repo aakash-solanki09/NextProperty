@@ -89,22 +89,6 @@ const CreateLand = () => {
       {success && <p className="text-green-600 mb-3">{success}</p>}
 
       <form onSubmit={handleSubmit} className="grid gap-4">
-        <input
-          type="text"
-          name="title"
-          placeholder="Title"
-          className={inputStyle}
-          value={formData.title}
-          onChange={handleChange}
-        />
-        <textarea
-          name="description"
-          placeholder="Description"
-          className={inputStyle}
-          value={formData.description}
-          onChange={handleChange}
-        />
-
         <select
           name="typeOfProperty"
           className={inputStyle}
@@ -123,7 +107,6 @@ const CreateLand = () => {
           <option value="Hostels">Hostels</option>
           <option value="Shops Showrooms">Shops Showrooms</option>
         </select>
-
         <select
           name="listingType"
           className={inputStyle}
@@ -135,9 +118,8 @@ const CreateLand = () => {
           <option value="rent">For Rent</option>
         </select>
 
-        {/* Dynamic Fields */}
-        {(formData.listingType === "rent" || formData.listingType === "sale") && (
-          <>
+
+      
             <input
               type="number"
               name="bhk"
@@ -146,16 +128,7 @@ const CreateLand = () => {
               value={formData.bhk}
               onChange={handleChange}
             />
-            <input
-              type="number"
-              name="area"
-              placeholder="Area (sq ft)"
-              className={inputStyle}
-              value={formData.area}
-              onChange={handleChange}
-            />
-          </>
-        )}
+
 
         {formData.listingType === "sale" && (
           <>
@@ -167,23 +140,15 @@ const CreateLand = () => {
               value={formData.carpetArea}
               onChange={handleChange}
             />
-            <input
-              type="number"
-              name="buildUpArea"
-              placeholder="Build-Up Area (sq ft)"
-              className={inputStyle}
-              value={formData.buildUpArea}
-              onChange={handleChange}
-            />
+
           </>
         )}
-
         <input
-          type="text"
-          name="location"
-          placeholder="Location"
+          type="number"
+          name="buildUpArea"
+          placeholder="Build-Up Area (sq ft)"
           className={inputStyle}
-          value={formData.location}
+          value={formData.buildUpArea}
           onChange={handleChange}
         />
         <input
@@ -194,6 +159,30 @@ const CreateLand = () => {
           value={formData.price}
           onChange={handleChange}
         />
+        <input
+          type="text"
+          name="title"
+          placeholder="Title"
+          className={inputStyle}
+          value={formData.title}
+          onChange={handleChange}
+        />
+        <textarea
+          name="description"
+          placeholder="Description"
+          className={inputStyle}
+          value={formData.description}
+          onChange={handleChange}
+        />
+        <input
+          type="text"
+          name="location"
+          placeholder="Location"
+          className={inputStyle}
+          value={formData.location}
+          onChange={handleChange}
+        />
+
 
         {/* Image Upload */}
         <div className="relative">

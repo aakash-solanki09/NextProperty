@@ -135,22 +135,6 @@ const UpdateLand = () => {
       {error && <p className="text-red-500 mb-3">{error}</p>}
 
       <form onSubmit={handleSubmit} className="grid gap-4">
-        <input
-          type="text"
-          name="title"
-          placeholder="Title"
-          className={inputStyle}
-          value={formData.title}
-          onChange={handleChange}
-        />
-        <textarea
-          name="description"
-          placeholder="Description"
-          className={inputStyle}
-          value={formData.description}
-          onChange={handleChange}
-        />
-
         <select
           name="typeOfProperty"
           className={inputStyle}
@@ -181,27 +165,22 @@ const UpdateLand = () => {
           <option value="Rent">Rent</option>
         </select>
 
-        {(formData.listingType === "Rent" || formData.listingType === "Sell") && (
-          <>
-            <input
-              type="number"
-              name="bhk"
-              placeholder="BHK (optional)"
-              className={inputStyle}
-              value={formData.bhk}
-              onChange={handleChange}
-            />
-            <input
-              type="text"
-              name="area"
-              placeholder="Area (e.g. 1200 sqft)"
-              className={inputStyle}
-              value={formData.area}
-              onChange={handleChange}
-            />
-          </>
-        )}
-
+        <input
+          type="number"
+          name="bhk"
+          placeholder="BHK (optional)"
+          className={inputStyle}
+          value={formData.bhk}
+          onChange={handleChange}
+        />
+        <input
+          type="text"
+          name="buildUpArea"
+          placeholder="Built-up Area (optional)"
+          className={inputStyle}
+          value={formData.buildUpArea}
+          onChange={handleChange}
+        />
         {formData.listingType === "Sell" && (
           <>
             <input
@@ -212,31 +191,38 @@ const UpdateLand = () => {
               value={formData.carpetArea}
               onChange={handleChange}
             />
-            <input
-              type="text"
-              name="buildUpArea"
-              placeholder="Built-up Area (optional)"
-              className={inputStyle}
-              value={formData.buildUpArea}
-              onChange={handleChange}
-            />
+
           </>
         )}
-
-        <input
-          type="text"
-          name="location"
-          placeholder="Location"
-          className={inputStyle}
-          value={formData.location}
-          onChange={handleChange}
-        />
         <input
           type="number"
           name="price"
           placeholder="Price"
           className={inputStyle}
           value={formData.price}
+          onChange={handleChange}
+        />
+        <input
+          type="text"
+          name="title"
+          placeholder="Title"
+          className={inputStyle}
+          value={formData.title}
+          onChange={handleChange}
+        />
+        <textarea
+          name="description"
+          placeholder="Description"
+          className={inputStyle}
+          value={formData.description}
+          onChange={handleChange}
+        />
+        <input
+          type="text"
+          name="location"
+          placeholder="Location"
+          className={inputStyle}
+          value={formData.location}
           onChange={handleChange}
         />
 

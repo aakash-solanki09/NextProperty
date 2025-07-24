@@ -3,7 +3,7 @@ import { getAllPublicProperties } from "../../api/property/propertyApi";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import heroBg from "../../assets/pexels-thelazyartist-1642125.jpg";
-
+import { Search } from "lucide-react"; 
 dayjs.extend(relativeTime);
 
 const AllPublicProperties = () => {
@@ -13,6 +13,7 @@ const AllPublicProperties = () => {
   const [typeFilter, setTypeFilter] = useState("");
   const [listingFilter, setListingFilter] = useState("");
   const [priceRange, setPriceRange] = useState("");
+  const [bhkFilter, setBhkFilter] = useState(""); // ✅ New BHK state
   const [sortOrder, setSortOrder] = useState("");
   const [activeFilters, setActiveFilters] = useState([]);
   const [imageIndexMap, setImageIndexMap] = useState({});
@@ -68,6 +69,10 @@ const AllPublicProperties = () => {
       filtered = filtered.filter((p) => p.price >= min && p.price <= max);
     }
 
+    if (bhkFilter) {
+      filtered = filtered.filter((p) => p.bhk && p.bhk.toString() === bhkFilter); // ✅ BHK filtering
+    }
+
     if (sortOrder === "newest") {
       filtered = [...filtered].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
     } else if (sortOrder === "oldest") {
@@ -75,10 +80,9 @@ const AllPublicProperties = () => {
     }
 
     setFilteredProperties(filtered);
-  }, [search, typeFilter, listingFilter, priceRange, sortOrder, properties]);
+  }, [search, typeFilter, listingFilter, priceRange, bhkFilter, sortOrder, properties]);
 
   useEffect(() => {
-    // Simple user agent check for mobile
     const checkMobile = () => {
       const ua = navigator.userAgent;
       setIsMobile(/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(ua));
@@ -93,6 +97,7 @@ const AllPublicProperties = () => {
     else if (type === "listing") setListingFilter(value);
     else if (type === "price") setPriceRange(value);
     else if (type === "sort") setSortOrder(value);
+    else if (type === "bhk") setBhkFilter(value); // ✅ Handle BHK
 
     if (!activeFilters.some((f) => f.type === type)) {
       setActiveFilters((prev) => [...prev, { type, value }]);
@@ -106,6 +111,7 @@ const AllPublicProperties = () => {
     if (type === "listing") setListingFilter("");
     if (type === "price") setPriceRange("");
     if (type === "sort") setSortOrder("");
+    if (type === "bhk") setBhkFilter(""); // ✅ Clear BHK
     setActiveFilters((prev) => prev.filter((f) => f.type !== type));
   };
 
@@ -149,28 +155,30 @@ const AllPublicProperties = () => {
           marginLeft: '-50vw',
           marginRight: '-50vw',
           width: '100vw',
-          height: '70vh',
+          height: '75vh',
           minHeight: 350,
           backgroundImage: `url(${heroBg})`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
-          // borderRadius removed for square corners
           overflow: 'hidden',
         }}
       >
         <div className="absolute inset-0 bg-black bg-opacity-50" />
-        <div className="relative z-10 flex flex-col items-center justify-center h-full w-full px-4">
-          <h1 className="text-4xl md:text-5xl font-extrabold text-white text-center mb-3 drop-shadow-lg">Find Your Dream Property</h1>
-          <p className="text-lg md:text-2xl text-white text-center mb-8 drop-shadow-lg">Browse the best properties for sale and rent in your city</p>
+        <div className="relative z-10 flex flex-col items-center   h-full w-full px-4">
+          <h1 className="text-4xl md:text-5xl font-extrabold text-white text-center mt-20  md:mt-20 mb-2  drop-shadow-lg">Find Your Dream Property</h1>
+          <p className="text-lg md:text-2xl text-white text-center  drop-shadow-lg">Browse the best properties for sale and rent in your city</p>
           {/* Filters/Search Bar in Hero */}
           <div className="w-full max-w-3xl bg-opacity-90 rounded-xl  p-4 flex flex-col sm:flex-row gap-4 items-center justify-center">
-            <input
-              type="text"
-              placeholder="Search..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="w-full sm:w-[40%] border border-gray-300 rounded-md px-3 py-2"
-            />
+            <div className="relative w-full sm:w-[40%]">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+              <input
+                type="text"
+                placeholder="Search..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className="w-full border border-gray-300 rounded-md pl-9 pr-3 py-2 focus:outline-none focus:ring-1 focus:ring-blue-400"
+              />
+            </div>
             <select
               value={sortOrder}
               onChange={(e) => handleSubFilterChange('sort', e.target.value)}
@@ -210,18 +218,6 @@ const AllPublicProperties = () => {
                     </select>
                   </label>
                   <label className="block text-sm mb-2">
-                    Listing:
-                    <select
-                      value={listingFilter}
-                      onChange={(e) => handleSubFilterChange('listing', e.target.value)}
-                      className="w-full mt-1 border px-2 py-1"
-                    >
-                      <option value="">Select Listing</option>
-                      <option value="sale">For Sale</option>
-                      <option value="rent">For Rent</option>
-                    </select>
-                  </label>
-                  <label className="block text-sm">
                     Price Range:
                     <select
                       value={priceRange}
@@ -234,6 +230,21 @@ const AllPublicProperties = () => {
                       <option value="1000001-5000000">₹10L–₹50L</option>
                       <option value="5000001-10000000">₹50L–₹1Cr</option>
                       <option value="10000001-100000000">₹1Cr+</option>
+                    </select>
+                  </label>
+                  <label className="block text-sm">
+                    BHK:
+                    <select
+                      value={bhkFilter}
+                      onChange={(e) => handleSubFilterChange('bhk', e.target.value)}
+                      className="w-full mt-1 border px-2 py-1"
+                    >
+                      <option value="">Select BHK</option>
+                      <option value="1">1 BHK</option>
+                      <option value="2">2 BHK</option>
+                      <option value="3">3 BHK</option>
+                      <option value="4">4 BHK</option>
+                      <option value="5">5+ BHK</option>
                     </select>
                   </label>
                 </div>
@@ -263,194 +274,226 @@ const AllPublicProperties = () => {
       </div>
 
       <div className="max-w-7xl mx-auto px-4">
-      {/* Properties Grid */}
-      <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
-        {filteredProperties.map((property) => {
-          const images = property.images || [property.imageUrl];
-          const currentIndex = imageIndexMap[property._id] || 0;
-          const currentImage = images[currentIndex];
+        {/* Listing Filter - below hero, above cards */}
+        <div className="flex items-center mb-6 mt-2">
+          <select
+            value={listingFilter}
+            onChange={(e) => handleSubFilterChange('listing', e.target.value)}
+            className="border border-blue-300 shadow-sm rounded-lg px-4 py-2 text-base font-medium text-blue-700 bg-white focus:outline-none focus:ring-2 focus:ring-blue-200 mr-4 w-56"
+          >
+            <option value="">All Listings</option>
+            <option value="sale">For Sale</option>
+            <option value="rent">For Rent</option>
+          </select>
+        </div>
 
-          return (
-            <div
-              key={property._id}
-              onClick={() => setSelectedProperty(property)}
-              className="bg-white shadow-lg rounded-2xl overflow-hidden text-sm cursor-pointer hover:shadow-2xl transition border border-gray-100 group"
-              style={{ minHeight: 340 }}
-            >
-              <div className="relative h-56 overflow-hidden">
+        {/* Properties Grid */}
+        <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+          {filteredProperties.map((property) => {
+            const images = property.images || [property.imageUrl];
+            const currentIndex = imageIndexMap[property._id] || 0;
+            const currentImage = images[currentIndex];
+
+            return (
+              <div
+                key={property._id}
+                onClick={() => setSelectedProperty(property)}
+                className="bg-white shadow-lg rounded-2xl overflow-hidden text-sm cursor-pointer hover:shadow-2xl transition border border-gray-100 group"
+                style={{ minHeight: 340 }}
+              >
+                <div className="relative h-56 overflow-hidden">
+                  <img
+                    src={currentImage}
+                    alt={property.title}
+                    className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                  />
+                  {images.length > 1 && (
+                    <div className="absolute inset-0 flex justify-between items-center px-2">
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handlePrevImage(property._id, images.length);
+                        }}
+                        className="bg-white bg-opacity-70 text-gray-700 text-lg rounded-full w-8 h-8 flex items-center justify-center shadow hover:bg-opacity-100"
+                      >
+                        ‹
+                      </button>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleNextImage(property._id, images.length);
+                        }}
+                        className="bg-white bg-opacity-70 text-gray-700 text-lg rounded-full w-8 h-8 flex items-center justify-center shadow hover:bg-opacity-100"
+                      >
+                        ›
+                      </button>
+                    </div>
+                  )}
+                  {property.listingType && (
+                    <span className={`absolute top-3 left-3 px-3 py-1 rounded-full text-xs font-semibold shadow ${property.listingType.toLowerCase() === 'sale' ? 'bg-green-100 text-green-700' : 'bg-blue-100 text-blue-700'}`}
+                    >
+                      {property.listingType.charAt(0).toUpperCase() + property.listingType.slice(1)}
+                    </span>
+                  )}
+                </div>
+
+                <div className="p-4 flex flex-col gap-2">
+                  <div className="flex items-center justify-between mb-1">
+                    <h3 className="text-lg font-bold truncate text-gray-900" title={property.title}>{property.title}</h3>
+                    <span className="text-blue-600 font-extrabold text-lg">₹{property.price.toLocaleString()}</span>
+                  </div>
+                  <p className="text-gray-500 text-xs mb-1 truncate font-semibold" title={property.location}><span className="font-semibold">{property.location}</span></p>
+                  <div className="flex items-center gap-3 ">
+                    <span className="inline-block bg-gray-100 text-gray-700 px-2 py-0.5 rounded text-xs font-medium">{property.bhk} BHK</span>
+                    <span className="inline-block bg-gray-100 text-gray-700 px-2 py-0.5 rounded text-xs font-medium">{property.buildUpArea} BA sq.ft</span>
+                    {property.listingType?.toLowerCase() === 'sale' && (
+                      <div className="flex flex-wrap gap-3 ">
+                        <span className="inline-block bg-gray-100 text-gray-700 px-2 py-0.5 rounded text-xs font-medium">Carpet Area: {property.carpetArea} sq.ft</span>
+                      </div>
+                    )}
+                  </div>
+                  <p className="text-xs text-gray-500">
+                    Posted {dayjs(property.createdAt).fromNow()}
+                  </p>
+                  <p className="text-gray-700 text-sm overflow-y-auto h-24 max-h-24 pr-2 overflow-x-hidden scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-100">
+                    {property.description}
+                  </p>
+                  <div className="flex justify-end mt-2">
+                    <button
+                      onClick={handleCallClick}
+                      className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-1.5 rounded-lg text-xs font-semibold shadow"
+                    >
+                      Call
+                    </button>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Custom Alert */}
+        {showAlert && !isMobile && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+            <div className="bg-white border border-blue-600 rounded-lg p-6 max-w-sm w-full shadow-xl text-center">
+              <h2 className="text-lg font-semibold text-black mb-2">📞 Contact Info</h2>
+              <p className="text-sm text-gray-700 mb-4">Call us at: <span className="font-bold">{alertMessage}</span></p>
+              <div className="flex justify-center gap-3">
+                <button
+                  onClick={() => {
+                    navigator.clipboard.writeText(alertMessage);
+                  }}
+                  className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded font-semibold"
+                >
+                  Copy
+                </button>
+                <button
+                  onClick={() => setShowAlert(false)}
+                  className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded"
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {selectedProperty && (
+          <div className="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center p-4">
+            <div className="bg-white w-[80%] max-w-5xl rounded-2xl shadow-2xl overflow-y-auto max-h-[100vh] relative flex flex-col lg:flex-row">
+              <button
+                className="absolute top-2 right-2 text-black text-2xl font-bold z-10 hover:text-red-600"
+                onClick={() => {
+                  setSelectedProperty(null);
+                  setModalImageIndex(0); // reset image index on close
+                }}
+              >
+                &times;
+              </button>
+
+              {/* Image Section with Arrows */}
+              <div className="w-full lg:w-[45%] h-72 lg:h-auto relative flex items-center justify-center bg-gray-50 rounded-t-2xl lg:rounded-l-2xl lg:rounded-tr-none">
                 <img
-                  src={currentImage}
-                  alt={property.title}
-                  className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                  src={
+                    selectedProperty.images?.[modalImageIndex] ||
+                    selectedProperty.imageUrl
+                  }
+                  alt={selectedProperty.title}
+                  className="w-full h-full object-cover rounded-t-2xl lg:rounded-l-2xl lg:rounded-tr-none"
                 />
-                {images.length > 1 && (
-                  <div className="absolute inset-0 flex justify-between items-center px-2">
+                {/* Left arrow */}
+                {selectedProperty.images?.length > 1 && (
+                  <>
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
-                        handlePrevImage(property._id, images.length);
+                        setModalImageIndex((prev) =>
+                          (prev - 1 + selectedProperty.images.length) %
+                          selectedProperty.images.length
+                        );
                       }}
-                      className="bg-white bg-opacity-70 text-gray-700 text-lg rounded-full w-8 h-8 flex items-center justify-center shadow hover:bg-opacity-100"
+                      className="absolute left-2 top-1/2 transform -translate-y-1/2 bg-white bg-opacity-80 text-gray-700 text-lg rounded-full w-8 h-8 flex items-center justify-center shadow hover:bg-opacity-100"
                     >
                       ‹
                     </button>
+
+                    {/* Right arrow */}
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
-                        handleNextImage(property._id, images.length);
+                        setModalImageIndex((prev) =>
+                          (prev + 1) % selectedProperty.images.length
+                        );
                       }}
-                      className="bg-white bg-opacity-70 text-gray-700 text-lg rounded-full w-8 h-8 flex items-center justify-center shadow hover:bg-opacity-100"
+                      className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-white bg-opacity-80 text-gray-700 text-lg rounded-full w-8 h-8 flex items-center justify-center shadow hover:bg-opacity-100"
                     >
                       ›
                     </button>
-                  </div>
-                )}
-                {property.listingType && (
-                  <span className={`absolute top-3 left-3 px-3 py-1 rounded-full text-xs font-semibold shadow ${property.listingType.toLowerCase() === 'sale' ? 'bg-green-100 text-green-700' : 'bg-blue-100 text-blue-700'}`}
-                  >
-                    {property.listingType.charAt(0).toUpperCase() + property.listingType.slice(1)}
-                  </span>
+                  </>
                 )}
               </div>
 
-              <div className="p-4 flex flex-col gap-2">
-                <div className="flex items-center justify-between mb-1">
-                  <h3 className="text-lg font-bold truncate text-gray-900" title={property.title}>{property.title}</h3>
-                  <span className="text-blue-600 font-extrabold text-lg">₹{property.price.toLocaleString()}</span>
+              {/* Content Section */}
+              <div className="w-full lg:w-[55%] p-6 flex flex-col gap-2">
+                <div className="flex items-center justify-between mb-2">
+                  <h2 className="text-2xl font-bold text-gray-900 mb-0">{selectedProperty.title}</h2>
+
+                  <span className="text-blue-600 font-extrabold text-xl">₹{selectedProperty.price?.toLocaleString()}</span>
                 </div>
-                <p className="text-gray-500 text-xs mb-1 truncate font-semibold" title={property.location}><span className="font-semibold">{property.location}</span></p>
-                <div className="flex items-center gap-3 mb-1">
-                  <span className="inline-block bg-gray-100 text-gray-700 px-2 py-0.5 rounded text-xs font-medium">{property.bhk} BHK</span>
-                  <span className="inline-block bg-gray-100 text-gray-700 px-2 py-0.5 rounded text-xs font-medium">{property.area} sq.ft</span>
+                <div className="flex ">
+                  <span className={` px-3 py-1 rounded text-xs font-semibold shadow w-fit mr-4 ${selectedProperty.listingType?.toLowerCase() === 'sale' ? 'bg-gray-100 text-gray-700' : 'bg-gray-100 text-gray-700'}`}>{selectedProperty.listingType}</span>
+                  <span className=" bg-gray-100 text-gray-700 px-3 py-1 rounded text-xs font-medium w-fit">Type: {selectedProperty.typeOfProperty}</span>
                 </div>
-                <p className="text-gray-700 text-sm line-clamp-2 min-h-[2.5em]">{property.description}</p>
-                <div className="flex justify-end mt-2">
-                  <button
-                    onClick={handleCallClick}
-                    className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-1.5 rounded-lg text-xs font-semibold shadow"
-                  >
-                    Call
-                  </button>
+                <p className="bg-gray-100 text-gray-700 px-3 py-1 rounded text-xs font-medium mb-1 w-fit">{selectedProperty.location}</p>
+
+                <div className="flex flex-wrap gap-3 mb-2">
+                  <span className="inline-block bg-gray-100 text-gray-700 px-3 py-1 rounded text-xs font-medium">BHK: {selectedProperty.bhk}</span>
+                  <span className="inline-block bg-gray-50 text-gray-800 px-3 py-1 rounded text-xs font-medium border">Build Up Area: {selectedProperty.buildUpArea} sq.ft</span>
+                  {selectedProperty.listingType?.toLowerCase() === 'sale' && (
+                    <div className="flex flex-wrap gap-3 mb-2">
+                      <span className="inline-block bg-gray-50 text-gray-800 px-3 py-1 rounded text-xs font-medium border">Carpet Area: {selectedProperty.carpetArea} sq.ft</span>
+                    </div>
+                  )}
+                  <span className="font-medium text-gray-700"></span>
+
                 </div>
+
+                <div className="flex flex-wrap gap-3 mb-2">
+                  <p className="bg-gray-100 text-gray-700 px-3 py-1 rounded text-xs font-medium">
+                    Posted {dayjs(selectedProperty.createdAt).fromNow()}
+                  </p>
+
+                </div>
+               <p className="text-gray-700 text-sm overflow-y-auto overflow-x-hidden max-h-24 pr-2 scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-100 border-2 border-gray-300 rounded-md p-2">
+                    {selectedProperty.description}
+                  </p>
               </div>
             </div>
-          );
-        })}
-      </div>
-
-      {/* Custom Alert */}
-      {showAlert && !isMobile && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-          <div className="bg-white border border-blue-600 rounded-lg p-6 max-w-sm w-full shadow-xl text-center">
-            <h2 className="text-lg font-semibold text-black mb-2">📞 Contact Info</h2>
-            <p className="text-sm text-gray-700 mb-4">Call us at: <span className="font-bold">{alertMessage}</span></p>
-            <div className="flex justify-center gap-3">
-              <button
-                onClick={() => {
-                  navigator.clipboard.writeText(alertMessage);
-                }}
-                className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded font-semibold"
-              >
-                Copy
-              </button>
-              <button
-                onClick={() => setShowAlert(false)}
-                className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded"
-              >
-                Close
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-     {selectedProperty && (
-  <div className="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center p-4">
-    <div className="bg-white w-full max-w-5xl rounded-2xl shadow-2xl overflow-y-auto max-h-[90vh] relative flex flex-col lg:flex-row">
-      <button
-        className="absolute top-2 right-2 text-black text-2xl font-bold z-10 hover:text-red-600"
-        onClick={() => {
-          setSelectedProperty(null);
-          setModalImageIndex(0); // reset image index on close
-        }}
-      >
-        &times;
-      </button>
-
-      {/* Image Section with Arrows */}
-      <div className="w-full lg:w-[45%] h-72 lg:h-auto relative flex items-center justify-center bg-gray-50 rounded-t-2xl lg:rounded-l-2xl lg:rounded-tr-none">
-        <img
-          src={
-            selectedProperty.images?.[modalImageIndex] ||
-            selectedProperty.imageUrl
-          }
-          alt={selectedProperty.title}
-          className="w-full h-full object-cover rounded-t-2xl lg:rounded-l-2xl lg:rounded-tr-none"
-        />
-        {/* Left arrow */}
-        {selectedProperty.images?.length > 1 && (
-          <>
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                setModalImageIndex((prev) =>
-                  (prev - 1 + selectedProperty.images.length) %
-                  selectedProperty.images.length
-                );
-              }}
-              className="absolute left-2 top-1/2 transform -translate-y-1/2 bg-white bg-opacity-80 text-gray-700 text-lg rounded-full w-8 h-8 flex items-center justify-center shadow hover:bg-opacity-100"
-            >
-              ‹
-            </button>
-
-            {/* Right arrow */}
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                setModalImageIndex((prev) =>
-                  (prev + 1) % selectedProperty.images.length
-                );
-              }}
-              className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-white bg-opacity-80 text-gray-700 text-lg rounded-full w-8 h-8 flex items-center justify-center shadow hover:bg-opacity-100"
-            >
-              ›
-            </button>
-          </>
-        )}
-      </div>
-
-      {/* Content Section */}
-      <div className="w-full lg:w-[55%] p-6 flex flex-col gap-2">
-        <div className="flex items-center justify-between mb-2">
-          <h2 className="text-2xl font-bold text-gray-900 mb-0">{selectedProperty.title}</h2>
-          <span className="text-blue-600 font-extrabold text-xl">₹{selectedProperty.price?.toLocaleString()}</span>
-        </div>
-        <p className="text-gray-500 text-sm font-semibold mb-1">{selectedProperty.location}</p>
-        <p className="text-gray-700 mb-2 text-base">{selectedProperty.description}</p>
-        <div className="flex flex-wrap gap-3 mb-2">
-          <span className="inline-block bg-gray-100 text-gray-700 px-3 py-1 rounded text-xs font-medium">BHK: {selectedProperty.bhk}</span>
-          <span className="inline-block bg-gray-100 text-gray-700 px-3 py-1 rounded text-xs font-medium">Area: {selectedProperty.area} sq.ft</span>
-          <span className="inline-block bg-gray-100 text-gray-700 px-3 py-1 rounded text-xs font-medium">Type: {selectedProperty.typeOfProperty}</span>
-          <span className="font-medium text-gray-700"></span>
-          <span className={`inline-block px-3 py-1 rounded text-xs font-semibold shadow ${selectedProperty.listingType?.toLowerCase() === 'sale' ? 'bg-green-100 text-green-700' : 'bg-blue-100 text-blue-700'}`}>{selectedProperty.listingType}</span>
-        </div>
-        {selectedProperty.listingType?.toLowerCase() === 'sale' && (
-          <div className="flex flex-wrap gap-3 mb-2">
-            <span className="inline-block bg-gray-50 text-gray-800 px-3 py-1 rounded text-xs font-medium border">Build Up Area: {selectedProperty.buildUpArea} sq.ft</span>
-            <span className="inline-block bg-gray-50 text-gray-800 px-3 py-1 rounded text-xs font-medium border">Carpet Area: {selectedProperty.carpetArea} sq.ft</span>
           </div>
         )}
-        <div className="flex flex-wrap gap-3 mb-2">
 
-          <span className="inline-block bg-gray-50 text-gray-800 px-3 py-1 rounded text-xs font-medium border">Posted: {dayjs(selectedProperty.createdAt).format('DD MMM YYYY')}</span>
-        </div>
+
       </div>
-    </div>
-  </div>
-)}
-
-
-    </div>
     </>
   );
 };

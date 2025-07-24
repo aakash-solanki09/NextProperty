@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { getAllPublicProperties, deleteProperty } from "../../api/property/propertyApi";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
+import { Search } from "lucide-react";
 
 dayjs.extend(relativeTime);
 
@@ -15,12 +16,12 @@ const AllLandsAdmin = () => {
   const [listingFilter, setListingFilter] = useState("");
   const [priceRange, setPriceRange] = useState("");
   const [sortOrder, setSortOrder] = useState("");
+  const [bhkFilter, setBhkFilter] = useState("");
   const [activeFilters, setActiveFilters] = useState([]);
+  const [imageIndices, setImageIndices] = useState({});
   const [selectedProperty, setSelectedProperty] = useState(null);
   const [modalType, setModalType] = useState("");
-  const [imageIndices, setImageIndices] = useState({});
   const [modalImageIndex, setModalImageIndex] = useState(0);
-  const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
 
   const navigate = useNavigate();
 
@@ -71,6 +72,10 @@ const AllLandsAdmin = () => {
       filtered = filtered.filter((p) => p.price >= min && p.price <= max);
     }
 
+    if (bhkFilter) {
+      filtered = filtered.filter((p) => String(p.bhk) === String(bhkFilter));
+    }
+
     if (sortOrder === "newest") {
       filtered = filtered.slice().sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
     } else if (sortOrder === "oldest") {
@@ -78,18 +83,29 @@ const AllLandsAdmin = () => {
     }
 
     setFilteredProperties(filtered);
-  }, [search, typeFilter, listingFilter, priceRange, sortOrder, properties]);
+  }, [
+    search,
+    typeFilter,
+    listingFilter,
+    priceRange,
+    sortOrder,
+    bhkFilter,
+    properties,
+  ]);
 
   const handleSubFilterChange = (type, value) => {
     if (type === "type") setTypeFilter(value);
     else if (type === "listing") setListingFilter(value);
     else if (type === "price") setPriceRange(value);
     else if (type === "sort") setSortOrder(value);
+    else if (type === "bhk") setBhkFilter(value);
 
     if (!activeFilters.some((f) => f.type === type)) {
       setActiveFilters((prev) => [...prev, { type, value }]);
     } else {
-      setActiveFilters((prev) => prev.map((f) => (f.type === type ? { type, value } : f)));
+      setActiveFilters((prev) =>
+        prev.map((f) => (f.type === type ? { type, value } : f))
+      );
     }
   };
 
@@ -98,21 +114,8 @@ const AllLandsAdmin = () => {
     if (type === "listing") setListingFilter("");
     if (type === "price") setPriceRange("");
     if (type === "sort") setSortOrder("");
+    if (type === "bhk") setBhkFilter("");
     setActiveFilters((prev) => prev.filter((f) => f.type !== type));
-  };
-
-  const confirmDelete = async () => {
-    if (!selectedProperty) return;
-    try {
-      await deleteProperty(selectedProperty._id);
-      setProperties((prev) => prev.filter((p) => p._id !== selectedProperty._id));
-      setFilteredProperties((prev) => prev.filter((p) => p._id !== selectedProperty._id));
-      setSelectedProperty(null);
-      setModalType("");
-    } catch (error) {
-      console.error("Failed to delete property:", error);
-      alert("Failed to delete property.");
-    }
   };
 
   const handlePrevImage = (id, imagesLength) => {
@@ -135,99 +138,97 @@ const AllLandsAdmin = () => {
     setModalType("view");
   };
 
-  const handleModalImageChange = (step) => {
-    if (!selectedProperty) return;
-    const images = selectedProperty.images || [];
-    setModalImageIndex((prev) => (prev + step + images.length) % images.length);
-  };
-
   return (
     <div className="max-w-7xl mx-auto mt-6 px-4">
       <h2 className="text-2xl font-bold mb-4 text-center">Manage All Properties</h2>
 
-      <div className="flex flex-col sm:flex-row gap-4 mb-4">
-        <input
-          type="text"
-          placeholder="Search..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className="w-full sm:w-[40%] border border-gray-300 rounded-md px-3 py-2"
-        />
+      {/* Filters Section */}
+      <div className="flex flex-col sm:flex-row gap-4 mb-4 flex-wrap">
+        {/* Search Input with Icon */}
+        <div className="relative w-full sm:w-[40%]">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+          <input
+            type="text"
+            placeholder="Search..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="w-full border border-gray-300 rounded-md pl-9 pr-3 py-2 focus:outline-none focus:ring-1 focus:ring-blue-400"
+          />
+        </div>
 
-        <select
-          value={sortOrder}
-          onChange={(e) => handleSubFilterChange("sort", e.target.value)}
-          className="border border-gray-300 rounded-md px-3 py-2"
-        >
-          <option value="">Sort By</option>
-          <option value="newest">Newest</option>
-          <option value="oldest">Oldest</option>
-        </select>
-
-        <div className="relative">
-          <button
-            onClick={() => setShowAdvancedFilters(!showAdvancedFilters)}
-            className="border border-gray-300 rounded-md px-3 py-2 w-full"
+        {/* Group 1: Type, Price, BHK */}
+        <div className="flex gap-4 flex-wrap">
+          <select
+            value={typeFilter}
+            onChange={(e) => handleSubFilterChange("type", e.target.value)}
+            className="border border-gray-300 rounded-md px-3 py-2"
           >
-            More Filters
-          </button>
-          {showAdvancedFilters && (
-            <div className="absolute z-10 mt-2 bg-white border rounded-md p-4 w-64 shadow-md">
-              <label className="block text-sm mb-2">
-                Type:
-                <select
-                  value={typeFilter}
-                  onChange={(e) => handleSubFilterChange("type", e.target.value)}
-                  className="w-full mt-1 border px-2 py-1"
-                >
-                  <option value="">Select Type</option>
-                  <option value="Flats">Flats</option>
-                  <option value="Builder Floors">Builder Floors</option>
-                  <option value="House Villas">House Villas</option>
-                  <option value="Plots">Plots</option>
-                  <option value="Farmhouses">Farmhouses</option>
-                  <option value="Hotels">Hotels</option>
-                  <option value="Lands">Lands</option>
-                  <option value="Office Spaces">Office Spaces</option>
-                  <option value="Hostels">Hostels</option>
-                  <option value="Shops Showrooms">Shops Showrooms</option>
-                </select>
-              </label>
-              <label className="block text-sm mb-2">
-                Listing:
-                <select
-                  value={listingFilter}
-                  onChange={(e) => handleSubFilterChange("listing", e.target.value)}
-                  className="w-full mt-1 border px-2 py-1"
-                >
-                  <option value="">Select Listing</option>
-                  <option value="sale">For Sale</option>
-                  <option value="rent">For Rent</option>
-                </select>
-              </label>
-              <label className="block text-sm">
-                Price Range:
-                <select
-                  value={priceRange}
-                  onChange={(e) => handleSubFilterChange("price", e.target.value)}
-                  className="w-full mt-1 border px-2 py-1"
-                >
-                  <option value="">Select Price</option>
-                  <option value="0-500000">Below ₹5L</option>
-                  <option value="500001-1000000">₹5L–₹10L</option>
-                  <option value="1000001-5000000">₹10L–₹50L</option>
-                  <option value="5000001-10000000">₹50L–₹1Cr</option>
-                  <option value="10000001-100000000">₹1Cr+</option>
-                </select>
-              </label>
-            </div>
-          )}
+            <option value="">Property Type</option>
+            <option value="Flats">Flats</option>
+            <option value="Builder Floors">Builder Floors</option>
+            <option value="House Villas">House Villas</option>
+            <option value="Plots">Plots</option>
+            <option value="Farmhouses">Farmhouses</option>
+            <option value="Hotels">Hotels</option>
+            <option value="Lands">Lands</option>
+            <option value="Office Spaces">Office Spaces</option>
+            <option value="Hostels">Hostels</option>
+            <option value="Shops Showrooms">Shops Showrooms</option>
+          </select>
+
+          <select
+            value={priceRange}
+            onChange={(e) => handleSubFilterChange("price", e.target.value)}
+            className="border border-gray-300 rounded-md px-3 py-2"
+          >
+            <option value="">Price Range</option>
+            <option value="0-500000">Below ₹5L</option>
+            <option value="500001-1000000">₹5L–₹10L</option>
+            <option value="1000001-5000000">₹10L–₹50L</option>
+            <option value="5000001-10000000">₹50L–₹1Cr</option>
+            <option value="10000001-100000000">₹1Cr+</option>
+          </select>
+
+          <select
+            value={bhkFilter}
+            onChange={(e) => handleSubFilterChange("bhk", e.target.value)}
+            className="border border-gray-300 rounded-md px-3 py-2"
+          >
+            <option value="">Select BHK</option>
+            <option value="1">1 BHK</option>
+            <option value="2">2 BHK</option>
+            <option value="3">3 BHK</option>
+            <option value="4">4 BHK</option>
+            <option value="5">5+ BHK</option>
+          </select>
+        </div>
+
+        {/* Group 2: Sort By and Listing */}
+        <div className="flex gap-4 flex-wrap">
+          <select
+            value={sortOrder}
+            onChange={(e) => handleSubFilterChange("sort", e.target.value)}
+            className="border border-gray-300 rounded-md px-3 py-2"
+          >
+            <option value="">Sort By</option>
+            <option value="newest">Newest</option>
+            <option value="oldest">Oldest</option>
+          </select>
+
+          <select
+            value={listingFilter}
+            onChange={(e) => handleSubFilterChange("listing", e.target.value)}
+            className="border border-gray-300 rounded-md px-3 py-2"
+          >
+            <option value="">Listing</option>
+            <option value="sale">For Sale</option>
+            <option value="rent">For Rent</option>
+          </select>
         </div>
       </div>
 
-      {/* Render active filters and properties here */}
-      {/* (Rest of the component remains unchanged) */}
-        {activeFilters.length > 0 && (
+      {/* Active Filters Display */}
+      {activeFilters.length > 0 && (
         <div className="flex flex-wrap gap-2 mb-6">
           {activeFilters.map((f, idx) => (
             <div
@@ -246,6 +247,8 @@ const AllLandsAdmin = () => {
         </div>
       )}
 
+      {/* CARD SECTION STARTS HERE */}
+
       {/* Property Cards */}
       <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
         {filteredProperties.map((property) => {
@@ -259,22 +262,20 @@ const AllLandsAdmin = () => {
               className="bg-white shadow-md rounded-xl overflow-hidden text-sm cursor-pointer"
               onClick={() => handleCardClick(property)}
             >
-              <div className="relative">
-                {images.length > 0 && (
-                  <img
-                    src={currentImage}
-                    alt={`property-${currentImageIndex}`}
-                    className="h-48 w-full object-cover"
-                  />
-                )}
+              <div className="relative h-56 overflow-hidden">
+                <img
+                  src={currentImage}
+                  alt={property.title}
+                  className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                />
                 {images.length > 1 && (
-                  <>
+                  <div className="absolute inset-0 flex justify-between items-center px-2">
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
                         handlePrevImage(property._id, images.length);
                       }}
-                      className="absolute top-1/2 left-2 transform -translate-y-1/2 bg-gray-800 text-white px-2 py-1 rounded-full text-xs"
+                      className="bg-white bg-opacity-70 text-gray-700 text-lg rounded-full w-8 h-8 flex items-center justify-center shadow hover:bg-opacity-100"
                     >
                       ‹
                     </button>
@@ -283,26 +284,40 @@ const AllLandsAdmin = () => {
                         e.stopPropagation();
                         handleNextImage(property._id, images.length);
                       }}
-                      className="absolute top-1/2 right-2 transform -translate-y-1/2 bg-gray-800 text-white px-2 py-1 rounded-full text-xs"
+                      className="bg-white bg-opacity-70 text-gray-700 text-lg rounded-full w-8 h-8 flex items-center justify-center shadow hover:bg-opacity-100"
                     >
                       ›
                     </button>
-                  </>
+                  </div>
+                )}
+                {property.listingType && (
+                  <span className={`absolute top-3 left-3 px-3 py-1 rounded-full text-xs font-semibold shadow ${property.listingType.toLowerCase() === 'sale' ? 'bg-green-100 text-green-700' : 'bg-blue-100 text-blue-700'}`}
+                  >
+                    {property.listingType.charAt(0).toUpperCase() + property.listingType.slice(1)}
+                  </span>
                 )}
               </div>
 
-              <div className="p-3">
-                <h3 className="text-lg font-semibold truncate">{property.title}</h3>
-                <p className="text-gray-600 h-12 overflow-hidden text-ellipsis">
-                  {property.description}
-                </p>
-                <p className="text-blue-500 font-bold mt-1">₹{property.price}</p>
-                <p className="text-xs text-gray-400">{property.location}</p>
+              <div className="p-4 flex flex-col gap-2">
+                <div className="flex items-center justify-between mb-1">
+                  <h3 className="text-lg font-bold truncate text-gray-900" title={property.title}>{property.title}</h3>
+                  <span className="text-blue-600 font-extrabold text-lg">₹{property.price.toLocaleString()}</span>
+                </div>
+                <p className="text-gray-500 text-xs mb-1 truncate font-semibold" title={property.location}><span className="font-semibold">{property.location}</span></p>
+                <div className="flex items-center gap-3 ">
+                  <span className="inline-block bg-gray-100 text-gray-700 px-2 py-0.5 rounded text-xs font-medium">{property.bhk} BHK</span>
+                  <span className="inline-block bg-gray-100 text-gray-700 px-2 py-0.5 rounded text-xs font-medium">{property.buildUpArea} BA sq.ft</span>
+                  {property.listingType?.toLowerCase() === 'sale' && (
+                    <div className="flex flex-wrap gap-3 ">
+                      <span className="inline-block bg-gray-100 text-gray-700 px-2 py-0.5 rounded text-xs font-medium">Carpet Area: {property.carpetArea} sq.ft</span>
+                    </div>
+                  )}
+                </div>
                 <p className="text-xs text-gray-500">
                   Posted {dayjs(property.createdAt).fromNow()}
                 </p>
-                <p className="text-xs text-gray-600 mt-1">
-                  Listing: <span className="capitalize font-medium">{property.listingType}</span>
+                <p className="text-gray-700 text-sm overflow-y-auto h-24 max-h-24 pr-2 overflow-x-hidden scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-100">
+                  {property.description}
                 </p>
 
                 <div className="mt-3 flex justify-end space-x-2">
@@ -313,7 +328,7 @@ const AllLandsAdmin = () => {
                     }}
                     className="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded text-xs"
                   >
-                    Update
+                    Edit
                   </button>
                   <button
                     onClick={(e) => {
@@ -333,39 +348,54 @@ const AllLandsAdmin = () => {
       </div>
 
       {/* View Modal */}
-      {selectedProperty && modalType === "view" && (
-        <div className="fixed inset-0 bg-black bg-opacity-60 z-50 flex items-center justify-center p-4">
-          <div className="bg-white max-w-4xl w-full rounded-xl shadow-lg overflow-auto max-h-[90vh] relative flex flex-col sm:flex-row">
+      {selectedProperty && (
+        <div className="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center p-4">
+          <div className="bg-white w-[80%] max-w-5xl rounded-2xl shadow-2xl overflow-y-auto max-h-[100vh] relative flex flex-col lg:flex-row">
             <button
+              className="absolute top-2 right-2 text-black text-2xl font-bold z-10 hover:text-red-600"
               onClick={() => {
                 setSelectedProperty(null);
-                setModalType("");
+                setModalImageIndex(0); // reset image index on close
               }}
-              className="absolute top-3 right-4 text-gray-700 text-2xl font-bold"
             >
-              ×
+              &times;
             </button>
 
-            {/* Image */}
-            <div className="sm:w-1/2 relative">
-              {selectedProperty.images.length > 0 && (
-                <img
-                  src={selectedProperty.images[modalImageIndex]}
-                  alt="Property"
-                  className="w-full h-64 sm:h-full object-cover rounded-l-xl"
-                />
-              )}
-              {selectedProperty.images.length > 1 && (
+            {/* Image Section with Arrows */}
+            <div className="w-full lg:w-[45%] h-72 lg:h-auto relative flex items-center justify-center bg-gray-50 rounded-t-2xl lg:rounded-l-2xl lg:rounded-tr-none">
+              <img
+                src={
+                  selectedProperty.images?.[modalImageIndex] ||
+                  selectedProperty.imageUrl
+                }
+                alt={selectedProperty.title}
+                className="w-full h-full object-cover rounded-t-2xl lg:rounded-l-2xl lg:rounded-tr-none"
+              />
+              {/* Left arrow */}
+              {selectedProperty.images?.length > 1 && (
                 <>
                   <button
-                    onClick={() => handleModalImageChange(-1)}
-                    className="absolute top-1/2 left-2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white px-2 py-1 rounded-full text-lg"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setModalImageIndex((prev) =>
+                        (prev - 1 + selectedProperty.images.length) %
+                        selectedProperty.images.length
+                      );
+                    }}
+                    className="absolute left-2 top-1/2 transform -translate-y-1/2 bg-white bg-opacity-80 text-gray-700 text-lg rounded-full w-8 h-8 flex items-center justify-center shadow hover:bg-opacity-100"
                   >
                     ‹
                   </button>
+
+                  {/* Right arrow */}
                   <button
-                    onClick={() => handleModalImageChange(1)}
-                    className="absolute top-1/2 right-2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white px-2 py-1 rounded-full text-lg"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setModalImageIndex((prev) =>
+                        (prev + 1) % selectedProperty.images.length
+                      );
+                    }}
+                    className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-white bg-opacity-80 text-gray-700 text-lg rounded-full w-8 h-8 flex items-center justify-center shadow hover:bg-opacity-100"
                   >
                     ›
                   </button>
@@ -373,18 +403,39 @@ const AllLandsAdmin = () => {
               )}
             </div>
 
-            {/* Details */}
-            <div className="p-5 sm:w-1/2 text-sm">
-              <h2 className="text-xl font-semibold mb-2">{selectedProperty.title}</h2>
-              <p className="mb-2">{selectedProperty.description}</p>
-              <p><strong>Type:</strong> {selectedProperty.typeOfProperty}</p>
-              <p><strong>Price:</strong> ₹{selectedProperty.price}</p>
-              <p><strong>BHK:</strong> {selectedProperty.bhk}</p>
-              <p><strong>Area:</strong> {selectedProperty.area} sq.ft</p>
-              <p><strong>Location:</strong> {selectedProperty.location}</p>
-              <p><strong>Listing Type:</strong> {selectedProperty.listingType}</p>
-              <p className="text-xs text-gray-500 mt-2">
-                Posted {dayjs(selectedProperty.createdAt).fromNow()}
+            {/* Content Section */}
+            <div className="w-full lg:w-[55%] p-6 flex flex-col gap-2">
+              <div className="flex items-center justify-between mb-2">
+                <h2 className="text-2xl font-bold text-gray-900 mb-0">{selectedProperty.title}</h2>
+
+                <span className="text-blue-600 font-extrabold text-xl">₹{selectedProperty.price?.toLocaleString()}</span>
+              </div>
+              <div className="flex ">
+                <span className={` px-3 py-1 rounded text-xs font-semibold shadow w-fit mr-4 ${selectedProperty.listingType?.toLowerCase() === 'sale' ? 'bg-gray-100 text-gray-700' : 'bg-gray-100 text-gray-700'}`}>{selectedProperty.listingType}</span>
+                <span className=" bg-gray-100 text-gray-700 px-3 py-1 rounded text-xs font-medium w-fit">Type: {selectedProperty.typeOfProperty}</span>
+              </div>
+              <p className="bg-gray-100 text-gray-700 px-3 py-1 rounded text-xs font-medium mb-1 w-fit">{selectedProperty.location}</p>
+
+              <div className="flex flex-wrap gap-3 mb-2">
+                <span className="inline-block bg-gray-100 text-gray-700 px-3 py-1 rounded text-xs font-medium">BHK: {selectedProperty.bhk}</span>
+                <span className="inline-block bg-gray-50 text-gray-800 px-3 py-1 rounded text-xs font-medium border">Build Up Area: {selectedProperty.buildUpArea} sq.ft</span>
+                {selectedProperty.listingType?.toLowerCase() === 'sale' && (
+                  <div className="flex flex-wrap gap-3 mb-2">
+                    <span className="inline-block bg-gray-50 text-gray-800 px-3 py-1 rounded text-xs font-medium border">Carpet Area: {selectedProperty.carpetArea} sq.ft</span>
+                  </div>
+                )}
+                <span className="font-medium text-gray-700"></span>
+
+              </div>
+
+              <div className="flex flex-wrap gap-3 mb-2">
+                <p className="bg-gray-100 text-gray-700 px-3 py-1 rounded text-xs font-medium">
+                  Posted {dayjs(selectedProperty.createdAt).fromNow()}
+                </p>
+
+              </div>
+              <p className="text-gray-700 text-sm overflow-y-auto overflow-x-hidden max-h-24 pr-2 scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-100 border-2 border-gray-300 rounded-md p-2">
+                {selectedProperty.description}
               </p>
             </div>
           </div>
