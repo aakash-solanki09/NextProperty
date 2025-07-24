@@ -155,7 +155,7 @@ const AllPublicProperties = () => {
           marginLeft: '-50vw',
           marginRight: '-50vw',
           width: '100vw',
-          height: '75vh',
+          height: '70vh',
           minHeight: 350,
           backgroundImage: `url(${heroBg})`,
           backgroundSize: 'cover',
@@ -165,8 +165,8 @@ const AllPublicProperties = () => {
       >
         <div className="absolute inset-0 bg-black bg-opacity-50" />
         <div className="relative z-10 flex flex-col items-center   h-full w-full px-4">
-          <h1 className="text-4xl md:text-5xl font-extrabold text-white text-center mt-20  md:mt-20 mb-2  drop-shadow-lg">Find Your Dream Property</h1>
-          <p className="text-lg md:text-2xl text-white text-center  drop-shadow-lg">Browse the best properties for sale and rent in your city</p>
+          <h1 className="text-4xl md:text-4xl font-extrabold text-white text-center mt-10  md:mt-8 mb-2  drop-shadow-lg">Find Your Dream Property</h1>
+          <p className="text-lg md:text-xl text-white text-center  drop-shadow-lg">Browse the best properties for sale and rent in your city</p>
           {/* Filters/Search Bar in Hero */}
           <div className="w-full max-w-3xl bg-opacity-90 rounded-xl  p-4 flex flex-col sm:flex-row gap-4 items-center justify-center">
             <div className="relative w-full sm:w-[40%]">
