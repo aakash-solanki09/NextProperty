@@ -155,7 +155,7 @@ const AllPublicProperties = () => {
           marginLeft: '-50vw',
           marginRight: '-50vw',
           width: '100vw',
-          height: '70vh',
+          height: '80vh',
           minHeight: 350,
           backgroundImage: `url(${heroBg})`,
           backgroundSize: 'cover',
@@ -165,8 +165,8 @@ const AllPublicProperties = () => {
       >
         <div className="absolute inset-0 bg-black bg-opacity-50" />
         <div className="relative z-10 flex flex-col items-center   h-full w-full px-4">
-          <h1 className="text-4xl md:text-4xl font-extrabold text-white text-center mt-10  md:mt-8 mb-2  drop-shadow-lg">Find Your Dream Property</h1>
-          <p className="text-lg md:text-xl text-white text-center  drop-shadow-lg">Browse the best properties for sale and rent in your city</p>
+          <h1 className="text-4xl md:text-xl font-extrabold text-white text-center mt-10  md:mt-8 mb-2  drop-shadow-lg">Find Your Dream Property</h1>
+          <p className="text-lg md:text-lg text-white text-center  drop-shadow-lg">Browse the best properties for sale and rent in your city</p>
           {/* Filters/Search Bar in Hero */}
           <div className="w-full max-w-3xl bg-opacity-90 rounded-xl  p-4 flex flex-col sm:flex-row gap-4 items-center justify-center">
             <div className="relative w-full sm:w-[40%]">
@@ -182,7 +182,7 @@ const AllPublicProperties = () => {
             <select
               value={sortOrder}
               onChange={(e) => handleSubFilterChange('sort', e.target.value)}
-              className="border border-gray-300 rounded-md px-3 py-2"
+              className="border border-gray-300 rounded-md px-3 py-2 text-center w-full  lg:w-20 md:w-20 xl:w-20"
             >
               <option value="">Sort By</option>
               <option value="newest">Newest</option>
@@ -205,7 +205,10 @@ const AllPublicProperties = () => {
                       className="w-full mt-1 border px-2 py-1"
                     >
                       <option value="">Select Type</option>
-                      <option value="Flats">Flats</option>
+                      <option value="Flat">Flat</option>
+                      <option value="House">House</option>
+                      <option value="Apartment">Apartment</option>
+                      {/*    <option value="Flats">Flats</option>
                       <option value="Builder Floors">Builder Floors</option>
                       <option value="House Villas">House Villas</option>
                       <option value="Plots">Plots</option>
@@ -214,7 +217,7 @@ const AllPublicProperties = () => {
                       <option value="Lands">Lands</option>
                       <option value="Office Spaces">Office Spaces</option>
                       <option value="Hostels">Hostels</option>
-                      <option value="Shops Showrooms">Shops Showrooms</option>
+                      <option value="Shops Showrooms">Shops Showrooms</option> */}
                     </select>
                   </label>
                   <label className="block text-sm mb-2">

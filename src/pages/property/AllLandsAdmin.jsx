@@ -164,7 +164,10 @@ const AllLandsAdmin = () => {
             className="border border-gray-300 rounded-md px-3 py-2"
           >
             <option value="">Property Type</option>
-            <option value="Flats">Flats</option>
+                     <option value="Flat">Flat</option>
+                      <option value="House">House</option>
+                      <option value="Apartment">Apartment</option>
+          {/*   <option value="Flats">Flats</option>
             <option value="Builder Floors">Builder Floors</option>
             <option value="House Villas">House Villas</option>
             <option value="Plots">Plots</option>
@@ -173,7 +176,7 @@ const AllLandsAdmin = () => {
             <option value="Lands">Lands</option>
             <option value="Office Spaces">Office Spaces</option>
             <option value="Hostels">Hostels</option>
-            <option value="Shops Showrooms">Shops Showrooms</option>
+            <option value="Shops Showrooms">Shops Showrooms</option> */}
           </select>
 
           <select
