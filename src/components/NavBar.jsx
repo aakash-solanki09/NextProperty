@@ -10,7 +10,7 @@ export default function NavBar() {
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
   const [isAdminLoggedIn, setIsAdminLoggedIn] = useState(false);
 
-  useEffect(() => { 
+  useEffect(() => {
     const handleResize = () => setIsMobile(window.innerWidth < 768);
     const checkAdmin = () => {
       const user = JSON.parse(localStorage.getItem("user"));
@@ -48,18 +48,16 @@ export default function NavBar() {
         <>
           <Link
             to="/"
-            className={`transition px-3 py-1 rounded border ${
-              location.pathname === "/" ? "border-gray-400 text-gray-300" : "border-transparent hover:text-white"
-            }`}
+            className={`transition px-3 py-1 rounded border ${location.pathname === "/" ? "border-gray-400 text-gray-300" : "border-transparent hover:text-white"
+              }`}
           >
             Home
           </Link>
 
           <Link
             to="/contact"
-            className={`transition px-3 py-1 rounded border ${
-              location.pathname === "/contact" ? "border-gray-400 text-gray-300" : "border-transparent hover:text-white"
-            }`}
+            className={`transition px-3 py-1 rounded border ${location.pathname === "/contact" ? "border-gray-400 text-gray-300" : "border-transparent hover:text-white"
+              }`}
           >
             Contact Us
           </Link>
@@ -70,22 +68,26 @@ export default function NavBar() {
         <>
           <Link
             to="/explore-properties"
-            className={`transition px-3 py-1 rounded border ${
-              location.pathname === "/explore-properties" ? "border-gray-400 text-gray-300" : "border-transparent hover:text-white"
-            }`}
+            className={`transition px-3 py-1 rounded border ${location.pathname === "/explore-properties" ? "border-gray-400 text-gray-300" : "border-transparent hover:text-white"
+              }`}
           >
-           Home
+            Home
           </Link>
 
           <Link
             to="/create-property"
-            className={`transition px-3 py-1 rounded border ${
-              location.pathname === "/create-property" ? "border-gray-400 text-gray-300" : "border-transparent hover:text-white"
-            }`}
+            className={`transition px-3 py-1 rounded border ${location.pathname === "/create-property" ? "border-gray-400 text-gray-300" : "border-transparent hover:text-white"
+              }`}
           >
-           Add Property
+            Add Property
           </Link>
-
+          <Link
+            to="/allContact"
+            className={`transition px-3 py-1 rounded border ${location.pathname === "/allContact" ? "border-gray-400 text-gray-300" : "border-transparent hover:text-white"
+              }`}
+          >
+            Contact
+          </Link>
           <button
             onClick={handleLogout}
             className={`transition px-3 py-1 rounded border border-transparent hover:text-white`}
