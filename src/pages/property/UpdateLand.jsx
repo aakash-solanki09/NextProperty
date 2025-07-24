@@ -18,6 +18,7 @@ const UpdateLand = () => {
     area: "",
     carpetArea: "",
     buildUpArea: "",
+    mobileNum
   });
 
   const [existingImages, setExistingImages] = useState([]);
@@ -40,9 +41,9 @@ const UpdateLand = () => {
           location: data.location || "",
           price: data.price || "",
           bhk: data.bhk || "",
-          area: data.area || "",
           carpetArea: data.carpetArea || "",
           buildUpArea: data.buildUpArea || "",
+          mobileNumber: data.mobileNum || ""
         });
         if (Array.isArray(data.images)) {
           setExistingImages(data.images);
@@ -78,8 +79,8 @@ const UpdateLand = () => {
     e.preventDefault();
     setError(null);
 
-    const { title, description, typeOfProperty, listingType, location, price } = formData;
-    if (!title || !description || !typeOfProperty || !listingType || !location || !price) {
+    const { title, description, typeOfProperty, listingType, location, price,mobileNum  } = formData;
+    if (!title || !description || !typeOfProperty || !listingType || !location || !price,!mobileNum ) {
       setError("Please fill in all required fields.");
       return;
     }
@@ -95,7 +96,7 @@ const UpdateLand = () => {
       data.append("listingType", listingType);
       data.append("location", location);
       data.append("price", price);
-
+      data.append("mobileNum", mobileNum);
       // Conditionally append
       if (formData.bhk) data.append("bhk", formData.bhk);
       if (formData.area) data.append("area", formData.area);
@@ -258,7 +259,17 @@ const UpdateLand = () => {
     />
   </div>
 
- 
+<div>
+  <label className="block text-sm font-medium text-black mb-1">Mobile Number</label>
+  <input
+    type="tel"
+    name="mobileNum"
+    placeholder="Enter Mobile Number"
+    className={inputStyle}
+    value={formData.mobileNum}
+    onChange={handleChange}
+  />
+</div> 
 
   {/* Image Upload */}
   <div>

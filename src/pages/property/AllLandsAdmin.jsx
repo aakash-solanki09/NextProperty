@@ -185,7 +185,14 @@ const AllLandsAdmin = () => {
             className="border border-gray-300 rounded-md px-3 py-2"
           >
             <option value="">Price Range</option>
-            <option value="0-500000">Below ₹5L</option>
+            <option value="0-5000">...below ₹5K</option>
+             <option value="5001-10000">₹5K-₹10K</option>
+            <option value="10001-20000">₹10K-₹20K</option>
+            <option value="20001-50000">₹20K-₹50K</option>
+            <option value="50001-100000">₹50K-₹1L</option>
+            <option value="100001-200000">₹1L-₹2L</option>
+            <option value="200001-300000">₹2L-₹3L</option>
+            <option value="300001-500000">₹3L-₹5L</option>
             <option value="500001-1000000">₹5L–₹10L</option>
             <option value="1000001-5000000">₹10L–₹50L</option>
             <option value="5000001-10000000">₹50L–₹1Cr</option>
@@ -309,7 +316,7 @@ const AllLandsAdmin = () => {
                 <p className="text-gray-500 text-xs mb-1 truncate font-semibold" title={property.location}><span className="font-semibold">{property.location}</span></p>
                 <div className="flex items-center gap-3 ">
                   <span className="inline-block bg-gray-100 text-gray-700 px-2 py-0.5 rounded text-xs font-medium">{property.bhk} BHK</span>
-                  <span className="inline-block bg-gray-100 text-gray-700 px-2 py-0.5 rounded text-xs font-medium">{property.buildUpArea} BA sq.ft</span>
+                  <span className="inline-block bg-gray-100 text-gray-700 px-2 py-0.5 rounded text-xs font-medium">{property.buildUpArea} Area sq.ft</span>
                   {property.listingType?.toLowerCase() === 'sale' && (
                     <div className="flex flex-wrap gap-3 ">
                       <span className="inline-block bg-gray-100 text-gray-700 px-2 py-0.5 rounded text-xs font-medium">Carpet Area: {property.carpetArea} sq.ft</span>
@@ -329,7 +336,9 @@ const AllLandsAdmin = () => {
                 <p className="text-gray-700 text-sm overflow-y-auto h-24 max-h-24 pr-2 overflow-x-hidden scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-100">
                   {property.description}
                 </p>
-
+                 <p className="text-xs text-gray-500">
+                   Mobile No: {property.mobileNum}
+                  </p>
                 <div className="mt-3 flex justify-end space-x-2">
                   <button
                     onClick={(e) => {
@@ -428,7 +437,7 @@ const AllLandsAdmin = () => {
 
               <div className="flex flex-wrap gap-3 mb-2">
                 <span className="inline-block bg-gray-100 text-gray-700 px-3 py-1 rounded text-xs font-medium">BHK: {selectedProperty.bhk}</span>
-                <span className="inline-block bg-gray-50 text-gray-800 px-3 py-1 rounded text-xs font-medium border">Build Up Area: {selectedProperty.buildUpArea} sq.ft</span>
+                <span className="inline-block bg-gray-50 text-gray-800 px-3 py-1 rounded text-xs font-medium border">Area: {selectedProperty.buildUpArea} sq.ft</span>
                 {selectedProperty.listingType?.toLowerCase() === 'sale' && (
                   <div className="flex flex-wrap gap-3 mb-2">
                     <span className="inline-block bg-gray-50 text-gray-800 px-3 py-1 rounded text-xs font-medium border">Carpet Area: {selectedProperty.carpetArea} sq.ft</span>
@@ -449,6 +458,9 @@ const AllLandsAdmin = () => {
               <p className="text-gray-700 text-sm overflow-y-auto overflow-x-hidden max-h-24 pr-2 scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-100 border-2 border-gray-300 rounded-md p-2">
                 {selectedProperty.description}
               </p>
+              <p className="bg-gray-100 text-gray-700 px-3 py-1 rounded text-xs font-medium">
+                 Mobile No: {selectedProperty.mobileNum}
+                </p>
             </div>
           </div>
         </div>

@@ -17,7 +17,8 @@ const CreateLand = () => {
     area: "",
     carpetArea: "",
     buildUpArea: "",
-    furnishedType: "" // Added furnishedType
+    furnishedType: "",
+     mobileNum: "" 
   });
 
   const [images, setImages] = useState([]);
@@ -55,12 +56,15 @@ const CreateLand = () => {
     setError(null);
     setSuccess(null);
 
-    const { title, description, typeOfProperty, listingType, location, price } = formData;
-    if (!title || !description || !typeOfProperty || !listingType || !location || !price) {
+    const { title, description, typeOfProperty, listingType, location, price,mobileNum  } = formData;
+    if (!title || !description || !typeOfProperty || !listingType || !location || !price ||  !mobileNum) {
       setError("Please fill in all required fields.");
       return;
     }
-
+  if (!/^\d{10}$/.test(mobileNum)) {
+  setError("Mobile number must be exactly 10 digits.");
+  return;
+   }
     try {
       setLoading(true);
 
@@ -150,11 +154,11 @@ const CreateLand = () => {
 
   {/* Build-Up Area */}
   <div>
-    <label className="block text-sm font-medium text-gray-700 mb-1">Build-Up Area (sq ft)</label>
+    <label className="block text-sm font-medium text-gray-700 mb-1">Area (sq ft)</label>
     <input
       type="number"
       name="buildUpArea"
-      placeholder="Build-Up Area"
+      placeholder="Area"
       className={inputStyle}
       value={formData.buildUpArea}
       onChange={handleChange}
@@ -229,6 +233,18 @@ const CreateLand = () => {
   </div>
 
  
+<div>
+  <label className="block text-sm font-medium text-gray-700 mb-1">Mobile Number</label>
+  <input
+    type="text"
+    name="mobileNum"
+    placeholder="Enter 10-digit mobile number"
+    className={inputStyle}
+    value={formData.mobileNum}
+    onChange={handleChange}
+  />
+</div>
+
 
   {/* Image Upload */}
   <div>
