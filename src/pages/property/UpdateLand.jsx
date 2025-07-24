@@ -119,8 +119,8 @@ const UpdateLand = () => {
 
   if (loading) return <p className="text-center mt-10">Loading...</p>;
 
-  const inputStyle =
-    "border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-400";
+  const inputStyle = "w-full border border-gray-300 rounded-md px-4 py-2 text-sm text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition";
+
 
   return (
     <div className="relative max-w-2xl mx-auto bg-white shadow-xl p-6 mt-6 rounded-2xl">
@@ -134,170 +134,208 @@ const UpdateLand = () => {
       <h2 className="text-xl font-semibold mb-4">Update Property</h2>
       {error && <p className="text-red-500 mb-3">{error}</p>}
 
-      <form onSubmit={handleSubmit} className="grid gap-4">
-        <select
-          name="typeOfProperty"
-          className={inputStyle}
-          value={formData.typeOfProperty}
-          onChange={handleChange}
-        >
-          <option value="">Select Property Type</option>
-          <option value="Flats">Flats</option>
-          <option value="Builder Floors">Builder Floors</option>
-          <option value="House Villas">House Villas</option>
-          <option value="Plots">Plots</option>
-          <option value="Farmhouses">Farmhouses</option>
-          <option value="Hotels">Hotels</option>
-          <option value="Lands">Lands</option>
-          <option value="Office Spaces">Office Spaces</option>
-          <option value="Hostels">Hostels</option>
-          <option value="Shops Showrooms">Shops Showrooms</option>
-        </select>
+     <form onSubmit={handleSubmit} className="grid gap-4">
+  {/* Property Type */}
+  <div>
+    <label className="block text-sm font-medium text-black mb-1">Property Type</label>
+    <select
+      name="typeOfProperty"
+      className={inputStyle}
+      value={formData.typeOfProperty}
+      onChange={handleChange}
+    >
+      <option value="">Select Property Type</option>
+      <option value="Flat">Flat</option>
+      <option value="House">House</option>
+      <option value="Apartment">Apartment</option>
+    </select>
+  </div>
 
-        <select
-          name="listingType"
-          className={inputStyle}
-          value={formData.listingType}
-          onChange={handleChange}
-        >
-          <option value="">Select Listing Type</option>
-          <option value="Sell">Sell</option>
-          <option value="Rent">Rent</option>
-        </select>
+  {/* Listing Type */}
+  <div>
+    <label className="block text-sm font-medium text-black mb-1">Listing Type</label>
+    <select
+      name="listingType"
+      className={inputStyle}
+      value={formData.listingType}
+      onChange={handleChange}
+    >
+      <option value="">Select Listing Type</option>
+      <option value="Sell">Sell</option>
+      <option value="Rent">Rent</option>
+    </select>
+  </div>
 
-        <input
-          type="number"
-          name="bhk"
-          placeholder="BHK (optional)"
-          className={inputStyle}
-          value={formData.bhk}
-          onChange={handleChange}
-        />
-        <input
-          type="text"
-          name="buildUpArea"
-          placeholder="Built-up Area (optional)"
-          className={inputStyle}
-          value={formData.buildUpArea}
-          onChange={handleChange}
-        />
-        {formData.listingType === "Sell" && (
-          <>
-            <input
-              type="text"
-              name="carpetArea"
-              placeholder="Carpet Area (optional)"
-              className={inputStyle}
-              value={formData.carpetArea}
-              onChange={handleChange}
+  {/* BHK */}
+  <div>
+    <label className="block text-sm font-medium text-black mb-1">BHK (Optional)</label>
+    <input
+      type="number"
+      name="bhk"
+      placeholder="Enter BHK"
+      className={inputStyle}
+      value={formData.bhk}
+      onChange={handleChange}
+    />
+  </div>
+
+  {/* Built-up Area */}
+  <div>
+    <label className="block text-sm font-medium text-black mb-1">Built-up Area (Optional)</label>
+    <input
+      type="text"
+      name="buildUpArea"
+      placeholder="Built-up Area"
+      className={inputStyle}
+      value={formData.buildUpArea}
+      onChange={handleChange}
+    />
+  </div>
+
+  {/* Carpet Area */}
+  {formData.listingType === "Sell" && (
+    <div>
+      <label className="block text-sm font-medium text-black mb-1">Carpet Area (Optional)</label>
+      <input
+        type="text"
+        name="carpetArea"
+        placeholder="Carpet Area"
+        className={inputStyle}
+        value={formData.carpetArea}
+        onChange={handleChange}
+      />
+    </div>
+  )}
+
+ {/* Location */}
+  <div>
+    <label className="block text-sm font-medium text-black mb-1">Location</label>
+    <input
+      type="text"
+      name="location"
+      placeholder="Enter Location"
+      className={inputStyle}
+      value={formData.location}
+      onChange={handleChange}
+    />
+  </div>
+  
+  {/* Price */}
+  <div>
+    <label className="block text-sm font-medium text-black mb-1">Price</label>
+    <input
+      type="number"
+      name="price"
+      placeholder="Enter Price"
+      className={inputStyle}
+      value={formData.price}
+      onChange={handleChange}
+    />
+  </div>
+
+  {/* Title */}
+  <div>
+    <label className="block text-sm font-medium text-black mb-1">Title</label>
+    <input
+      type="text"
+      name="title"
+      placeholder="Enter Title"
+      className={inputStyle}
+      value={formData.title}
+      onChange={handleChange}
+    />
+  </div>
+
+  {/* Description */}
+  <div>
+    <label className="block text-sm font-medium text-black mb-1">Description</label>
+    <textarea
+      name="description"
+      placeholder="Enter Description"
+      className={inputStyle}
+      value={formData.description}
+      onChange={handleChange}
+    />
+  </div>
+
+ 
+
+  {/* Image Upload */}
+  <div>
+    <label className="block text-sm font-medium text-black mb-2">Upload Images</label>
+    <label
+      htmlFor="image-upload"
+      className="flex flex-col items-center justify-center border-2 border-dashed border-gray-400 rounded-xl p-4 cursor-pointer hover:border-blue-500 transition"
+    >
+      <Upload className="w-6 h-6 text-blue-600 mb-2" />
+      <span className="text-sm text-gray-600">
+        Upload up to 5 new images (optional)
+      </span>
+      <input
+        id="image-upload"
+        type="file"
+        accept="image/*"
+        multiple
+        onChange={handleImageChange}
+        className="hidden"
+      />
+    </label>
+
+    {imagePreviews.length > 0 && (
+      <div className="grid grid-cols-2 gap-2 mt-3">
+        {imagePreviews.map((src, idx) => (
+          <img
+            key={idx}
+            src={src}
+            alt={`New Preview ${idx}`}
+            className="rounded-xl h-32 object-cover w-full border"
+          />
+        ))}
+      </div>
+    )}
+
+    {imagePreviews.length === 0 && existingImages.length > 0 && (
+      <div className="grid grid-cols-2 gap-2 mt-3">
+        {existingImages.map((url, idx) => (
+          <div key={idx} className="relative group">
+            <img
+              src={url}
+              alt={`Existing ${idx}`}
+              className="rounded-xl h-32 object-cover w-full border"
             />
+            <button
+              type="button"
+              onClick={() => handleRemoveExistingImage(url)}
+              className="absolute top-1 right-1 bg-red-600 text-white text-xs rounded-full px-1 opacity-0 group-hover:opacity-100 transition"
+              title="Remove image"
+            >
+              ×
+            </button>
+          </div>
+        ))}
+      </div>
+    )}
+  </div>
 
-          </>
-        )}
-        <input
-          type="number"
-          name="price"
-          placeholder="Price"
-          className={inputStyle}
-          value={formData.price}
-          onChange={handleChange}
-        />
-        <input
-          type="text"
-          name="title"
-          placeholder="Title"
-          className={inputStyle}
-          value={formData.title}
-          onChange={handleChange}
-        />
-        <textarea
-          name="description"
-          placeholder="Description"
-          className={inputStyle}
-          value={formData.description}
-          onChange={handleChange}
-        />
-        <input
-          type="text"
-          name="location"
-          placeholder="Location"
-          className={inputStyle}
-          value={formData.location}
-          onChange={handleChange}
-        />
+  {/* Buttons */}
+  <div className="flex justify-between mt-3">
+    <button
+      type="button"
+      onClick={() => navigate("/explore-properties")}
+      className="bg-gray-300 hover:bg-gray-400 text-black py-2 px-4 rounded-xl"
+    >
+      Cancel
+    </button>
+    <button
+      type="submit"
+      className="bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-xl"
+      disabled={submitting}
+    >
+      {submitting ? "Updating..." : "Update"}
+    </button>
+  </div>
+</form>
 
-        <div className="relative">
-          <label
-            htmlFor="image-upload"
-            className="flex flex-col items-center justify-center border-2 border-dashed border-gray-400 rounded-xl p-4 cursor-pointer hover:border-blue-500 transition"
-          >
-            <Upload className="w-6 h-6 text-blue-600 mb-2" />
-            <span className="text-sm text-gray-600">
-              Upload up to 5 new images (optional)
-            </span>
-            <input
-              id="image-upload"
-              type="file"
-              accept="image/*"
-              multiple
-              onChange={handleImageChange}
-              className="hidden"
-            />
-          </label>
-
-          {imagePreviews.length > 0 && (
-            <div className="grid grid-cols-2 gap-2 mt-3">
-              {imagePreviews.map((src, idx) => (
-                <img
-                  key={idx}
-                  src={src}
-                  alt={`New Preview ${idx}`}
-                  className="rounded-xl h-32 object-cover w-full border"
-                />
-              ))}
-            </div>
-          )}
-
-          {imagePreviews.length === 0 && existingImages.length > 0 && (
-            <div className="grid grid-cols-2 gap-2 mt-3">
-              {existingImages.map((url, idx) => (
-                <div key={idx} className="relative group">
-                  <img
-                    src={url}
-                    alt={`Existing ${idx}`}
-                    className="rounded-xl h-32 object-cover w-full border"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => handleRemoveExistingImage(url)}
-                    className="absolute top-1 right-1 bg-red-600 text-white text-xs rounded-full px-1 opacity-0 group-hover:opacity-100 transition"
-                    title="Remove image"
-                  >
-                    ×
-                  </button>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-
-        <div className="flex justify-between mt-3">
-          <button
-            type="button"
-            onClick={() => navigate("/explore-properties")}
-            className="bg-gray-300 hover:bg-gray-400 text-black py-2 px-4 rounded-xl"
-          >
-            Cancel
-          </button>
-          <button
-            type="submit"
-            className="bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-xl"
-            disabled={submitting}
-          >
-            {submitting ? "Updating..." : "Update"}
-          </button>
-        </div>
-      </form>
     </div>
   );
 };

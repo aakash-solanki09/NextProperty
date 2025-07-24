@@ -16,7 +16,8 @@ const CreateLand = () => {
     bhk: "",
     area: "",
     carpetArea: "",
-    buildUpArea: ""
+    buildUpArea: "",
+    furnishedType: "" // Added furnishedType
   });
 
   const [images, setImages] = useState([]);
@@ -80,157 +81,209 @@ const CreateLand = () => {
   };
 
   const inputStyle =
-    "border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-400";
-
+    "w-full border border-gray-300 rounded-md px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition";
   return (
     <div className="max-w-2xl mx-auto bg-white shadow-xl p-6 mt-6 rounded-2xl">
       <h2 className="text-xl font-semibold mb-4">Add Property</h2>
       {error && <p className="text-red-500 mb-3">{error}</p>}
       {success && <p className="text-green-600 mb-3">{success}</p>}
+<form onSubmit={handleSubmit} className="space-y-5">
 
-      <form onSubmit={handleSubmit} className="grid gap-4">
-        <select
-          name="typeOfProperty"
-          className={inputStyle}
-          value={formData.typeOfProperty}
-          onChange={handleChange}
-        >
-          <option value="">Select Property Type</option>
-          <option value="Flats">Flats</option>
-          <option value="Builder Floors">Builder Floors</option>
-          <option value="House Villas">House Villas</option>
-          <option value="Plots">Plots</option>
-          <option value="Farmhouses">Farmhouses</option>
-          <option value="Hotels">Hotels</option>
-          <option value="Lands">Lands</option>
-          <option value="Office Spaces">Office Spaces</option>
-          <option value="Hostels">Hostels</option>
-          <option value="Shops Showrooms">Shops Showrooms</option>
-        </select>
-        <select
-          name="listingType"
-          className={inputStyle}
-          value={formData.listingType}
-          onChange={handleChange}
-        >
-          <option value="">Select Listing Type</option>
-          <option value="sale">For Sale</option>
-          <option value="rent">For Rent</option>
-        </select>
+  {/* Property Type */}
+  <div>
+    <label className="block text-sm font-medium text-gray-700 mb-1">Property Type</label>
+    <select
+      name="typeOfProperty"
+      className={inputStyle}
+      value={formData.typeOfProperty}
+      onChange={handleChange}
+    >
+      <option value="">Select Property Type</option>
+      <option value="Flat">Flat</option>
+      <option value="House">House</option>
+      <option value="Apartment">Apartment</option>
+    </select>
+  </div>
 
+  {/* Listing Type */}
+  <div>
+    <label className="block text-sm font-medium text-gray-700 mb-1">Listing Type</label>
+    <select
+      name="listingType"
+      className={inputStyle}
+      value={formData.listingType}
+      onChange={handleChange}
+    >
+      <option value="">Select Listing Type</option>
+      <option value="sale">For Sale</option>
+      <option value="rent">For Rent</option>
+    </select>
+  </div>
 
-      
-            <input
-              type="number"
-              name="bhk"
-              placeholder="BHK"
-              className={inputStyle}
-              value={formData.bhk}
-              onChange={handleChange}
-            />
+  {/* BHK */}
+  <div>
+    <label className="block text-sm font-medium text-gray-700 mb-1">BHK</label>
+    <input
+      type="number"
+      name="bhk"
+      placeholder="e.g. 2"
+      className={inputStyle}
+      value={formData.bhk}
+      onChange={handleChange}
+    />
+  </div>
 
+  {/* Carpet Area - only if listingType is sale */}
+  {formData.listingType === "sale" && (
+    <div>
+      <label className="block text-sm font-medium text-gray-700 mb-1">Carpet Area (sq ft)</label>
+      <input
+        type="number"
+        name="carpetArea"
+        placeholder="Carpet Area"
+        className={inputStyle}
+        value={formData.carpetArea}
+        onChange={handleChange}
+      />
+    </div>
+  )}
 
-        {formData.listingType === "sale" && (
-          <>
-            <input
-              type="number"
-              name="carpetArea"
-              placeholder="Carpet Area (sq ft)"
-              className={inputStyle}
-              value={formData.carpetArea}
-              onChange={handleChange}
-            />
+  {/* Build-Up Area */}
+  <div>
+    <label className="block text-sm font-medium text-gray-700 mb-1">Build-Up Area (sq ft)</label>
+    <input
+      type="number"
+      name="buildUpArea"
+      placeholder="Build-Up Area"
+      className={inputStyle}
+      value={formData.buildUpArea}
+      onChange={handleChange}
+    />
+  </div>
 
-          </>
-        )}
-        <input
-          type="number"
-          name="buildUpArea"
-          placeholder="Build-Up Area (sq ft)"
-          className={inputStyle}
-          value={formData.buildUpArea}
-          onChange={handleChange}
-        />
-        <input
-          type="number"
-          name="price"
-          placeholder="Price"
-          className={inputStyle}
-          value={formData.price}
-          onChange={handleChange}
-        />
-        <input
-          type="text"
-          name="title"
-          placeholder="Title"
-          className={inputStyle}
-          value={formData.title}
-          onChange={handleChange}
-        />
-        <textarea
-          name="description"
-          placeholder="Description"
-          className={inputStyle}
-          value={formData.description}
-          onChange={handleChange}
-        />
-        <input
-          type="text"
-          name="location"
-          placeholder="Location"
-          className={inputStyle}
-          value={formData.location}
-          onChange={handleChange}
-        />
+  {/* Furnished Type */}
+  <div>
+    <label className="block text-sm font-medium text-gray-700 mb-1">Furnishing</label>
+    <select
+      name="furnishedType"
+      className={inputStyle}
+      value={formData.furnishedType}
+      onChange={handleChange}
+    >
+      <option value="">Select Furnishing</option>
+      <option value="furnished">Furnished</option>
+      <option value="semi-furnished">Semi-Furnished</option>
+      <option value="unfurnished">Unfurnished</option>
+    </select>
+  </div>
 
+ {/* Location */}
+  <div>
+    <label className="block text-sm font-medium text-gray-700 mb-1">Location</label>
+    <input
+      type="text"
+      name="location"
+      placeholder="Enter location"
+      className={inputStyle}
+      value={formData.location}
+      onChange={handleChange}
+    />
+  </div>
 
-        {/* Image Upload */}
-        <div className="relative">
-          <label
-            htmlFor="image-upload"
-            className="flex flex-col items-center justify-center border-2 border-dashed border-gray-400 rounded-xl p-4 cursor-pointer hover:border-blue-500 transition"
+  {/* Price */}
+  <div>
+    <label className="block text-sm font-medium text-gray-700 mb-1">Price (₹)</label>
+    <input
+      type="number"
+      name="price"
+      placeholder="Enter price"
+      className={inputStyle}
+      value={formData.price}
+      onChange={handleChange}
+    />
+  </div>
+
+  {/* Title */}
+  <div>
+    <label className="block text-sm font-medium text-gray-700 mb-1">Title</label>
+    <input
+      type="text"
+      name="title"
+      placeholder="Enter title"
+      className={inputStyle}
+      value={formData.title}
+      onChange={handleChange}
+    />
+  </div>
+
+  {/* Description */}
+  <div>
+    <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+    <textarea
+      name="description"
+      placeholder="Write a short description..."
+      className={`${inputStyle} h-28 resize-none`}
+      value={formData.description}
+      onChange={handleChange}
+    />
+  </div>
+
+ 
+
+  {/* Image Upload */}
+  <div>
+    <label className="block text-sm font-medium text-gray-700 mb-2">Upload Images</label>
+    <label
+      htmlFor="image-upload"
+      className="flex flex-col items-center justify-center border-2 border-dashed border-gray-300 rounded-xl p-5 cursor-pointer hover:border-blue-500 transition"
+    >
+      <Upload className="w-6 h-6 text-blue-600 mb-2" />
+      <span className="text-sm text-gray-600">Upload up to 5 images</span>
+      <input
+        id="image-upload"
+        type="file"
+        accept="image/*"
+        multiple
+        onChange={handleImageChange}
+        className="hidden"
+      />
+    </label>
+
+    {/* Preview */}
+    <div className="grid grid-cols-2 md:grid-cols-4 gap-2 mt-4">
+      {imagePreviews.map((src, idx) => (
+        <div key={idx} className="relative group">
+          <img
+            src={src}
+            alt={`Preview ${idx}`}
+            className="rounded-lg h-28 object-cover w-full border"
+          />
+          <button
+            type="button"
+            onClick={() => handleRemoveImage(idx)}
+            className="absolute top-1 right-1 bg-red-600 text-white text-xs rounded-full px-1 opacity-0 group-hover:opacity-100 transition"
+            title="Remove image"
           >
-            <Upload className="w-6 h-6 text-blue-600 mb-2" />
-            <span className="text-sm text-gray-600">Upload up to 5 images</span>
-            <input
-              id="image-upload"
-              type="file"
-              accept="image/*"
-              multiple
-              onChange={handleImageChange}
-              className="hidden"
-            />
-          </label>
-
-          <div className="grid grid-cols-2 gap-2 mt-3">
-            {imagePreviews.map((src, idx) => (
-              <div key={idx} className="relative group">
-                <img
-                  src={src}
-                  alt={`Preview ${idx}`}
-                  className="rounded-xl h-32 object-cover w-full border"
-                />
-                <button
-                  type="button"
-                  onClick={() => handleRemoveImage(idx)}
-                  className="absolute top-1 right-1 bg-red-600 text-white text-xs rounded-full px-1 opacity-0 group-hover:opacity-100 transition"
-                  title="Remove image"
-                >
-                  ×
-                </button>
-              </div>
-            ))}
-          </div>
+            ×
+          </button>
         </div>
+      ))}
+    </div>
+  </div>
 
-        <button
-          type="submit"
-          className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-xl mt-2"
-          disabled={loading}
-        >
-          {loading ? "Creating..." : "Submit"}
-        </button>
-      </form>
+  {/* Submit Button */}
+  <div className="text-right">
+    <button
+      type="submit"
+      className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-6 rounded-lg shadow-sm"
+      disabled={loading}
+    >
+      {loading ? "Submitting..." : "Submit"}
+    </button>
+  </div>
+</form>
+
+
     </div>
   );
 };

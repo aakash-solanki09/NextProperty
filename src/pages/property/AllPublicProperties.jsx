@@ -3,7 +3,7 @@ import { getAllPublicProperties } from "../../api/property/propertyApi";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import heroBg from "../../assets/pexels-thelazyartist-1642125.jpg";
-import { Search } from "lucide-react"; 
+import { Search } from "lucide-react";
 dayjs.extend(relativeTime);
 
 const AllPublicProperties = () => {
@@ -352,9 +352,15 @@ const AllPublicProperties = () => {
                       </div>
                     )}
                   </div>
-                  <p className="text-xs text-gray-500">
-                    Posted {dayjs(property.createdAt).fromNow()}
-                  </p>
+                  <div className="flex gap-10">
+                    <p className="text-xs text-gray-500">
+                      {property.furnishedType}
+                    </p>
+                    <p className="text-xs text-gray-500">
+                      Posted {dayjs(property.createdAt).fromNow()}
+                    </p>
+
+                  </div>
                   <p className="text-gray-700 text-sm overflow-y-auto h-24 max-h-24 pr-2 overflow-x-hidden scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-100">
                     {property.description}
                   </p>
@@ -480,13 +486,15 @@ const AllPublicProperties = () => {
 
                 <div className="flex flex-wrap gap-3 mb-2">
                   <p className="bg-gray-100 text-gray-700 px-3 py-1 rounded text-xs font-medium">
+                    {selectedProperty.furnishedType}
+                  </p>
+                  <p className="bg-gray-100 text-gray-700 px-3 py-1 rounded text-xs font-medium">
                     Posted {dayjs(selectedProperty.createdAt).fromNow()}
                   </p>
-
                 </div>
-               <p className="text-gray-700 text-sm overflow-y-auto overflow-x-hidden max-h-24 pr-2 scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-100 border-2 border-gray-300 rounded-md p-2">
-                    {selectedProperty.description}
-                  </p>
+                <p className="text-gray-700 text-sm overflow-y-auto overflow-x-hidden max-h-24 pr-2 scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-100 border-2 border-gray-300 rounded-md p-2">
+                  {selectedProperty.description}
+                </p>
               </div>
             </div>
           </div>

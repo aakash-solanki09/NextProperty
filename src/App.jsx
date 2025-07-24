@@ -13,7 +13,7 @@ import PrivateRoute from "./components/PrivateRoute";
 import AllPublicProperties from "./pages/property/AllPublicProperties";
 import AllLandsAdmin from "./pages/property/AllLandsAdmin";
 import Login from "./pages/auth/Login";
-
+import AllContacts from "./pages/contact/AllContact";
 function App() {
   return (
    <>
@@ -25,6 +25,7 @@ function App() {
           <Route path="/about" element={<About />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/admin/login" element={<Login/>} />
+             <Route path="/allContact" element={<AllContacts/>} />
          {/*  <Route path="/auth/signup" element={<AuthPage />} /> */}
 
           {/* Protected Routes */}
