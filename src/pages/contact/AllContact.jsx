@@ -47,7 +47,7 @@ export default function AllContacts() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-200 font-sans px-4 py-6 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-white from-gray-50 to-gray-200 font-sans px-4 py-6 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
         <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 text-center mb-6 sm:mb-8 animate-in fade-in zoom-in-50 duration-500">
           All Contacts
