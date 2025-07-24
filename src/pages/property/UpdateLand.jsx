@@ -18,7 +18,7 @@ const UpdateLand = () => {
     area: "",
     carpetArea: "",
     buildUpArea: "",
-    mobileNum
+     mobileNum: "" 
   });
 
   const [existingImages, setExistingImages] = useState([]);
