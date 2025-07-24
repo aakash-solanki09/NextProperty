@@ -46,16 +46,16 @@ const AllLandsAdmin = () => {
   useEffect(() => {
     let filtered = properties;
 
-    if (search.trim()) {
-      const lowerSearch = search.toLowerCase();
-      filtered = filtered.filter(
-        (p) =>
-          p.title.toLowerCase().includes(lowerSearch) ||
-          p.description.toLowerCase().includes(lowerSearch) ||
-          p.location.toLowerCase().includes(lowerSearch) ||
-          p.price.toString().includes(lowerSearch)
-      );
-    }
+   if (search.trim()) {
+  const lowerSearch = search.toLowerCase().trim();
+  filtered = filtered.filter((p) =>
+    (p.title || "").toLowerCase().trim().includes(lowerSearch) ||
+    (p.description || "").toLowerCase().trim().includes(lowerSearch) ||
+    (p.location || "").toLowerCase().trim().includes(lowerSearch) ||
+    (p.price ? p.price.toString().trim() : "").includes(lowerSearch) ||
+    (p.landmark || "").toLowerCase().trim().includes(lowerSearch)
+  );
+}
 
     if (typeFilter) {
       filtered = filtered.filter((p) => p.typeOfProperty === typeFilter);
@@ -149,7 +149,7 @@ const AllLandsAdmin = () => {
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
           <input
             type="text"
-            placeholder="Search..."
+            placeholder="Search by city,landmark,title..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className="w-full border border-gray-300 rounded-md pl-9 pr-3 py-2 focus:outline-none focus:ring-1 focus:ring-blue-400"
@@ -313,7 +313,10 @@ const AllLandsAdmin = () => {
                   <h3 className="text-lg font-bold truncate text-gray-900" title={property.title}>{property.title}</h3>
                   <span className="text-blue-600 font-extrabold text-lg">₹{property.price.toLocaleString()}</span>
                 </div>
-                <p className="text-gray-500 text-xs mb-1 truncate font-semibold" title={property.location}><span className="font-semibold">{property.location}</span></p>
+                <div className="flex gap-4 ">
+                <p className="text-gray-500 text-xs mb-1 truncate font-semibold">city : {property.location}</p>
+                <p className="text-gray-500 text-xs mb-1 truncate font-semibold">LandMark : {property.landmark}</p>
+               </div>
                 <div className="flex items-center gap-3 ">
                   <span className="inline-block bg-gray-100 text-gray-700 px-2 py-0.5 rounded text-xs font-medium">{property.bhk} BHK</span>
                   <span className="inline-block bg-gray-100 text-gray-700 px-2 py-0.5 rounded text-xs font-medium">{property.buildUpArea} Area sq.ft</span>
@@ -431,16 +434,18 @@ const AllLandsAdmin = () => {
               </div>
               <div className="flex ">
                 <span className={` px-3 py-1 rounded text-xs font-semibold shadow w-fit mr-4 ${selectedProperty.listingType?.toLowerCase() === 'sale' ? 'bg-gray-100 text-gray-700' : 'bg-gray-100 text-gray-700'}`}>{selectedProperty.listingType}</span>
-                <span className=" bg-gray-100 text-gray-700 px-3 py-1 rounded text-xs font-medium w-fit">Type: {selectedProperty.typeOfProperty}</span>
+                <span className=" bg-gray-100 text-gray-700 px-3 py-1 rounded text-xs font-medium w-fit">Type : {selectedProperty.typeOfProperty}</span>
               </div>
-              <p className="bg-gray-100 text-gray-700 px-3 py-1 rounded text-xs font-medium mb-1 w-fit">{selectedProperty.location}</p>
-
+              <div className="flex gap-3">
+              <p className="bg-gray-100 text-gray-700 px-3 py-1 rounded text-xs font-medium mb-1 w-fit">city : {selectedProperty.location}</p>
+              <p className="bg-gray-100 text-gray-700 px-3 py-1 rounded text-xs font-medium mb-1 w-fit">Landmark : {selectedProperty.landmark}</p>
+              </div>
               <div className="flex flex-wrap gap-3 mb-2">
-                <span className="inline-block bg-gray-100 text-gray-700 px-3 py-1 rounded text-xs font-medium">BHK: {selectedProperty.bhk}</span>
-                <span className="inline-block bg-gray-50 text-gray-800 px-3 py-1 rounded text-xs font-medium border">Area: {selectedProperty.buildUpArea} sq.ft</span>
+                <span className="inline-block bg-gray-100 text-gray-700 px-3 py-1 rounded text-xs font-medium">BHK : {selectedProperty.bhk}</span>
+                <span className="inline-block bg-gray-50 text-gray-800 px-3 py-1 rounded text-xs font-medium border">Area : {selectedProperty.buildUpArea} sq.ft</span>
                 {selectedProperty.listingType?.toLowerCase() === 'sale' && (
                   <div className="flex flex-wrap gap-3 mb-2">
-                    <span className="inline-block bg-gray-50 text-gray-800 px-3 py-1 rounded text-xs font-medium border">Carpet Area: {selectedProperty.carpetArea} sq.ft</span>
+                    <span className="inline-block bg-gray-50 text-gray-800 px-3 py-1 rounded text-xs font-medium border">Carpet Area : {selectedProperty.carpetArea} sq.ft</span>
                   </div>
                 )}
                 <span className="font-medium text-gray-700"></span>

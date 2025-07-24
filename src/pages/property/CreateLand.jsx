@@ -18,7 +18,8 @@ const CreateLand = () => {
     carpetArea: "",
     buildUpArea: "",
     furnishedType: "",
-     mobileNum: "" 
+     mobileNum: "" ,
+     landmark:""
   });
 
   const [images, setImages] = useState([]);
@@ -56,8 +57,8 @@ const CreateLand = () => {
     setError(null);
     setSuccess(null);
 
-    const { title, description, typeOfProperty, listingType, location, price,mobileNum  } = formData;
-    if (!title || !description || !typeOfProperty || !listingType || !location || !price ||  !mobileNum) {
+    const { title, description, typeOfProperty, listingType, location, price,mobileNum,landmark  } = formData;
+    if (!title || !description || !typeOfProperty || !listingType || !location || !price ||  !mobileNum ,!landmark) {
       setError("Please fill in all required fields.");
       return;
     }
@@ -92,7 +93,6 @@ const CreateLand = () => {
       {error && <p className="text-red-500 mb-3">{error}</p>}
       {success && <p className="text-green-600 mb-3">{success}</p>}
 <form onSubmit={handleSubmit} className="space-y-5">
-
   {/* Property Type */}
   <div>
     <label className="block text-sm font-medium text-gray-700 mb-1">Property Type</label>
@@ -181,18 +181,99 @@ const CreateLand = () => {
     </select>
   </div>
 
- {/* Location */}
+  {/* Location */}
   <div>
-    <label className="block text-sm font-medium text-gray-700 mb-1">Location</label>
-    <input
-      type="text"
+    <label className="block text-sm font-medium text-gray-700 mb-1">Location (City)</label>
+    <select
       name="location"
-      placeholder="Enter location"
       className={inputStyle}
       value={formData.location}
-      onChange={handleChange}
-    />
+      onChange={(e) => {
+        handleChange(e);
+        setFormData((prev) => ({ ...prev, landmark: "" }));
+      }}
+    >
+      <option value="">Select City</option>
+      <option value="bhopal">Bhopal</option>
+      <option value="indore">Indore</option>
+    </select>
   </div>
+
+  {/* Landmark */}
+  {formData.location && (
+    <div>
+      <label className="block text-sm font-medium text-gray-700 mb-1">Landmark</label>
+      <select
+        name="landmark"
+        className={inputStyle}
+        value={formData.landmark}
+        onChange={handleChange}
+      >
+        <option value="">Select Landmark</option>
+        {(formData.location === "bhopal"
+          ? [
+              "Mp nagar",
+              "Kolar",
+              "Hoshangabad road",
+              "Shahpura",
+              "Chunabhatti",
+              "Ashoka garden",
+              "Rachna Nagar",
+              "Shivaji nagar",
+              "Saket nagar",
+              "Bawadiya kalan",
+              "Gulmohar",
+              "Punjabi bagh",
+              "Bittan market",
+              "Gautam nagar",
+              "Old subhash nagar",
+              "Arera colony",
+              "Indrapuri",
+              "Rohit nagar",
+            ]
+          : [
+              "Navlakha",
+              "Pipaliya pala park",
+              "Musakhedi",
+              "Khajrana",
+              "Kalani nagar",
+              "Sangam nagar",
+              "Vijaynagar",
+              "Bhanwarkua",
+              "Mahalakshmi nagar",
+              "Rau",
+              "Lal bagh palace",
+              "Dhabli",
+              "Niranjanpur",
+              "Nipania",
+              "Bicholi mardana",
+              "Rajendra Nagar",
+              "Chandan nagar",
+              "Sukhaliya",
+              "Palasiya",
+              "Pardesipura",
+              "Tilak Nagar",
+              "Alok nagar",
+              "South tukoganj",
+              "Mari mata square",
+              "Luv kush square",
+              "Nanda nagar",
+              "Super corridor",
+              "Mhow",
+              "Dewas Naka",
+              "Scheme no 140",
+              "Mr 10",
+              "Mr 11",
+              "Gandhi Nagar",
+            ]
+        ).map((landmark, idx) => (
+          <option key={idx} value={landmark}>
+            {landmark}
+          </option>
+        ))}
+      </select>
+    </div>
+  )}
 
   {/* Price */}
   <div>
@@ -232,19 +313,18 @@ const CreateLand = () => {
     />
   </div>
 
- 
-<div>
-  <label className="block text-sm font-medium text-gray-700 mb-1">Mobile Number</label>
-  <input
-    type="text"
-    name="mobileNum"
-    placeholder="Enter 10-digit mobile number"
-    className={inputStyle}
-    value={formData.mobileNum}
-    onChange={handleChange}
-  />
-</div>
-
+  {/* Mobile Number */}
+  <div>
+    <label className="block text-sm font-medium text-gray-700 mb-1">Mobile Number</label>
+    <input
+      type="text"
+      name="mobileNum"
+      placeholder="Enter 10-digit mobile number"
+      className={inputStyle}
+      value={formData.mobileNum}
+      onChange={handleChange}
+    />
+  </div>
 
   {/* Image Upload */}
   <div>
@@ -298,6 +378,7 @@ const CreateLand = () => {
     </button>
   </div>
 </form>
+
 
 
     </div>

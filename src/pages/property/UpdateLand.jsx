@@ -18,7 +18,8 @@ const UpdateLand = () => {
     area: "",
     carpetArea: "",
     buildUpArea: "",
-     mobileNum: "" 
+    mobileNum: "",
+    landmark: ""
   });
 
   const [existingImages, setExistingImages] = useState([]);
@@ -43,7 +44,8 @@ const UpdateLand = () => {
           bhk: data.bhk || "",
           carpetArea: data.carpetArea || "",
           buildUpArea: data.buildUpArea || "",
-          mobileNumber: data.mobileNum || ""
+          mobileNum: data.mobileNum || "",
+          landmark: data.landmark || ""
         });
         if (Array.isArray(data.images)) {
           setExistingImages(data.images);
@@ -79,8 +81,8 @@ const UpdateLand = () => {
     e.preventDefault();
     setError(null);
 
-    const { title, description, typeOfProperty, listingType, location, price,mobileNum  } = formData;
-    if (!title || !description || !typeOfProperty || !listingType || !location || !price,!mobileNum ) {
+    const { title, description, typeOfProperty, listingType, location, price, mobileNum, landmark } = formData;
+    if (!title || !description || !typeOfProperty || !listingType || !location || !price || !mobileNum || !landmark) {
       setError("Please fill in all required fields.");
       return;
     }
@@ -97,12 +99,13 @@ const UpdateLand = () => {
       data.append("location", location);
       data.append("price", price);
       data.append("mobileNum", mobileNum);
+      data.append("landmark", landmark);
+      data.append("buildUpArea", formData.buildUpArea);
       // Conditionally append
       if (formData.bhk) data.append("bhk", formData.bhk);
       if (formData.area) data.append("area", formData.area);
       if (listingType === "Sell") {
         if (formData.carpetArea) data.append("carpetArea", formData.carpetArea);
-        if (formData.buildUpArea) data.append("buildUpArea", formData.buildUpArea);
       }
 
       newImages.forEach((file) => data.append("images", file));
@@ -135,7 +138,7 @@ const UpdateLand = () => {
       <h2 className="text-xl font-semibold mb-4">Update Property</h2>
       {error && <p className="text-red-500 mb-3">{error}</p>}
 
-     <form onSubmit={handleSubmit} className="grid gap-4">
+      <form onSubmit={handleSubmit} className="grid gap-4">
   {/* Property Type */}
   <div>
     <label className="block text-sm font-medium text-black mb-1">Property Type</label>
@@ -208,19 +211,100 @@ const UpdateLand = () => {
     </div>
   )}
 
- {/* Location */}
+  {/* City */}
   <div>
-    <label className="block text-sm font-medium text-black mb-1">Location</label>
-    <input
-      type="text"
+    <label className="block text-sm font-medium text-black mb-1">City</label>
+    <select
       name="location"
-      placeholder="Enter Location"
       className={inputStyle}
       value={formData.location}
-      onChange={handleChange}
-    />
+      onChange={(e) => {
+        handleChange(e);
+        setFormData((prev) => ({ ...prev, landmark: "" })); // reset landmark on city change
+      }}
+    >
+      <option value="">Select City</option>
+      <option value="bhopal">Bhopal</option>
+      <option value="indore">Indore</option>
+    </select>
   </div>
-  
+
+  {/* Landmark */}
+  {formData.location && (
+    <div>
+      <label className="block text-sm font-medium text-black mb-1">Landmark</label>
+      <select
+        name="landmark"
+        className={inputStyle}
+        value={formData.landmark}
+        onChange={handleChange}
+      >
+        <option value="">Select Landmark</option>
+        {(formData.location === "bhopal"
+          ? [
+              "Mp nagar",
+              "Kolar",
+              "Hoshangabad road",
+              "Shahpura",
+              "Chunabhatti",
+              "Ashoka garden",
+              "Rachna Nagar",
+              "Shivaji nagar",
+              "Saket nagar",
+              "Bawadiya kalan",
+              "Gulmohar",
+              "Punjabi bagh",
+              "Bittan market",
+              "Gautam nagar",
+              "Old subhash nagar",
+              "Arera colony",
+              "Indrapuri",
+              "Rohit nagar",
+            ]
+          : [
+              "Navlakha",
+              "Pipaliya pala park",
+              "Musakhedi",
+              "Khajrana",
+              "Kalani nagar",
+              "Sangam nagar",
+              "Vijaynagar",
+              "Bhanwarkua",
+              "Mahalakshmi nagar",
+              "Rau",
+              "Lal bagh palace",
+              "Dhabli",
+              "Niranjanpur",
+              "Nipania",
+              "Bicholi mardana",
+              "Rajendra Nagar",
+              "Chandan nagar",
+              "Sukhaliya",
+              "Palasiya",
+              "Pardesipura",
+              "Tilak Nagar",
+              "Alok nagar",
+              "South tukoganj",
+              "Mari mata square",
+              "Luv kush square",
+              "Nanda nagar",
+              "Super corridor",
+              "Mhow",
+              "Dewas Naka",
+              "Scheme no 140",
+              "Mr 10",
+              "Mr 11",
+              "Gandhi Nagar",
+            ]
+        ).map((landmark, idx) => (
+          <option key={idx} value={landmark}>
+            {landmark}
+          </option>
+        ))}
+      </select>
+    </div>
+  )}
+
   {/* Price */}
   <div>
     <label className="block text-sm font-medium text-black mb-1">Price</label>
@@ -259,17 +343,18 @@ const UpdateLand = () => {
     />
   </div>
 
-<div>
-  <label className="block text-sm font-medium text-black mb-1">Mobile Number</label>
-  <input
-    type="tel"
-    name="mobileNum"
-    placeholder="Enter Mobile Number"
-    className={inputStyle}
-    value={formData.mobileNum}
-    onChange={handleChange}
-  />
-</div> 
+  {/* Mobile Number */}
+  <div>
+    <label className="block text-sm font-medium text-black mb-1">Mobile Number</label>
+    <input
+      type="tel"
+      name="mobileNum"
+      placeholder="Enter Mobile Number"
+      className={inputStyle}
+      value={formData.mobileNum}
+      onChange={handleChange}
+    />
+  </div>
 
   {/* Image Upload */}
   <div>
@@ -346,6 +431,7 @@ const UpdateLand = () => {
     </button>
   </div>
 </form>
+
 
     </div>
   );

@@ -13,7 +13,7 @@ const AllPublicProperties = () => {
   const [typeFilter, setTypeFilter] = useState("");
   const [listingFilter, setListingFilter] = useState("");
   const [priceRange, setPriceRange] = useState("");
-  const [bhkFilter, setBhkFilter] = useState(""); // ✅ New BHK state
+  const [bhkFilter, setBhkFilter] = useState(""); 
   const [sortOrder, setSortOrder] = useState("");
   const [activeFilters, setActiveFilters] = useState([]);
   const [imageIndexMap, setImageIndexMap] = useState({});
@@ -43,16 +43,16 @@ const AllPublicProperties = () => {
   useEffect(() => {
     let filtered = properties;
 
-    if (search.trim()) {
-      const lowerSearch = search.toLowerCase();
-      filtered = filtered.filter(
-        (p) =>
-          p.title.toLowerCase().includes(lowerSearch) ||
-          p.description.toLowerCase().includes(lowerSearch) ||
-          p.location.toLowerCase().includes(lowerSearch) ||
-          p.price.toString().includes(lowerSearch)
-      );
-    }
+  if (search.trim()) {
+  const lowerSearch = search.toLowerCase().trim();
+  filtered = filtered.filter((p) =>
+    (p.title || "").toLowerCase().trim().includes(lowerSearch) ||
+    (p.description || "").toLowerCase().trim().includes(lowerSearch) ||
+    (p.location || "").toLowerCase().trim().includes(lowerSearch) ||
+    (p.price ? p.price.toString().trim() : "").includes(lowerSearch) ||
+    (p.landmark || "").toLowerCase().trim().includes(lowerSearch)
+  );
+}
 
     if (typeFilter) {
       filtered = filtered.filter((p) => p.typeOfProperty === typeFilter);
@@ -70,7 +70,7 @@ const AllPublicProperties = () => {
     }
 
     if (bhkFilter) {
-      filtered = filtered.filter((p) => p.bhk && p.bhk.toString() === bhkFilter); // ✅ BHK filtering
+      filtered = filtered.filter((p) => p.bhk && p.bhk.toString() === bhkFilter);
     }
 
     if (sortOrder === "newest") {
@@ -97,7 +97,7 @@ const AllPublicProperties = () => {
     else if (type === "listing") setListingFilter(value);
     else if (type === "price") setPriceRange(value);
     else if (type === "sort") setSortOrder(value);
-    else if (type === "bhk") setBhkFilter(value); // ✅ Handle BHK
+    else if (type === "bhk") setBhkFilter(value); 
 
     if (!activeFilters.some((f) => f.type === type)) {
       setActiveFilters((prev) => [...prev, { type, value }]);
@@ -165,15 +165,15 @@ const AllPublicProperties = () => {
       >
         <div className="absolute inset-0 bg-black bg-opacity-50" />
         <div className="relative z-10 flex flex-col items-center   h-full w-full px-4">
-          <h1 className="text-4xl md:text-xl font-extrabold text-white text-center mt-10  md:mt-8 mb-2  drop-shadow-lg">Find Your Dream Property</h1>
-          <p className="text-lg md:text-lg text-white text-center  drop-shadow-lg">Browse the best properties for sale and rent in your city</p>
+          <h1 className="text-4xl md:text-3xl font-extrabold text-white text-center mt-10  md:mt-20 lg:mt-25 xl:mt-30 mb-2  drop-shadow-lg">Find Your Dream Property</h1>
+          <p className="text-lg md:text-2xl text-white text-center  drop-shadow-lg">Browse the best properties for sale and rent in your city</p>
           {/* Filters/Search Bar in Hero */}
           <div className="w-full max-w-3xl bg-opacity-90 rounded-xl  p-4 flex flex-col sm:flex-row gap-4 items-center justify-center">
             <div className="relative w-full sm:w-[40%]">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
               <input
                 type="text"
-                placeholder="Search..."
+                placeholder="Search by city, landmark, title..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 className="w-full border border-gray-300 rounded-md pl-9 pr-3 py-2 focus:outline-none focus:ring-1 focus:ring-blue-400"
@@ -352,7 +352,10 @@ const AllPublicProperties = () => {
                     <h3 className="text-lg font-bold truncate text-gray-900" title={property.title}>{property.title}</h3>
                     <span className="text-blue-600 font-extrabold text-lg">₹{property.price.toLocaleString()}</span>
                   </div>
-                  <p className="text-gray-500 text-xs mb-1 truncate font-semibold" title={property.location}><span className="font-semibold">{property.location}</span></p>
+                  <div className="flex gap-4 ">
+                <p className="text-gray-500 text-xs mb-1 truncate font-semibold">city : {property.location}</p>
+                <p className="text-gray-500 text-xs mb-1 truncate font-semibold">LandMark : {property.landmark}</p>
+               </div>
                   <div className="flex items-center gap-3 ">
                     <span className="inline-block bg-gray-100 text-gray-700 px-2 py-0.5 rounded text-xs font-medium">{property.bhk} BHK</span>
                     <span className="inline-block bg-gray-100 text-gray-700 px-2 py-0.5 rounded text-xs font-medium"> Area: {property.buildUpArea} sq.ft</span>
@@ -480,7 +483,10 @@ const AllPublicProperties = () => {
                   <span className={` px-3 py-1 rounded text-xs font-semibold shadow w-fit mr-4 ${selectedProperty.listingType?.toLowerCase() === 'sale' ? 'bg-gray-100 text-gray-700' : 'bg-gray-100 text-gray-700'}`}>{selectedProperty.listingType}</span>
                   <span className=" bg-gray-100 text-gray-700 px-3 py-1 rounded text-xs font-medium w-fit">Type: {selectedProperty.typeOfProperty}</span>
                 </div>
-                <p className="bg-gray-100 text-gray-700 px-3 py-1 rounded text-xs font-medium mb-1 w-fit">{selectedProperty.location}</p>
+               <div className="flex gap-3">
+              <p className="bg-gray-100 text-gray-700 px-3 py-1 rounded text-xs font-medium mb-1 w-fit">city : {selectedProperty.location}</p>
+              <p className="bg-gray-100 text-gray-700 px-3 py-1 rounded text-xs font-medium mb-1 w-fit">Landmark : {selectedProperty.landmark}</p>
+              </div>
 
                 <div className="flex flex-wrap gap-3 mb-2">
                   <span className="inline-block bg-gray-100 text-gray-700 px-3 py-1 rounded text-xs font-medium">BHK: {selectedProperty.bhk}</span>
