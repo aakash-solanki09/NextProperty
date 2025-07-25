@@ -6,6 +6,7 @@ export default function Login() {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({ email: "", password: "" });
   const [error, setError] = useState("");
+  const [showAlert, setShowAlert] = useState(false);
 
   const handleChange = (e) =>
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -14,11 +15,15 @@ export default function Login() {
     e.preventDefault();
     try {
       await loginUser(formData);
-      alert("Login successful!"); 
-      navigate("/explore-properties");
+      setShowAlert(true); // show custom alert
     } catch (err) {
       setError(err.message || "Login failed");
     }
+  };
+
+  const handleAlertClose = () => {
+    setShowAlert(false);
+    navigate("/explore-properties");
   };
 
   return (
@@ -45,8 +50,22 @@ export default function Login() {
           </button>
         </form>
         {error && <p className="text-red-600 text-sm mt-2">{error}</p>}
-       
       </div>
+
+      {/* ✅ Custom Alert Modal */}
+      {showAlert && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+          <div className="bg-white border border-blue-500 text-black rounded-lg shadow-xl p-6 w-80 text-center">
+            <h2 className="text-xl font-semibold text-blue-600 mb-4">Login Successful!</h2>
+            <button
+              onClick={handleAlertClose}
+              className="mt-4 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition"
+            >
+              Continue
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

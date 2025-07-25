@@ -17,6 +17,8 @@ const AllLandsAdmin = () => {
   const [priceRange, setPriceRange] = useState("");
   const [sortOrder, setSortOrder] = useState("");
   const [bhkFilter, setBhkFilter] = useState("");
+   const [landMarkFilter, setlandMarkFilter] = useState("");
+  const [cityFilter, setCityFilter] = useState("");
   const [activeFilters, setActiveFilters] = useState([]);
   const [imageIndices, setImageIndices] = useState({});
   const [selectedProperty, setSelectedProperty] = useState(null);
@@ -75,6 +77,13 @@ const AllLandsAdmin = () => {
     if (bhkFilter) {
       filtered = filtered.filter((p) => String(p.bhk) === String(bhkFilter));
     }
+    if (cityFilter) {
+      filtered = filtered.filter((p) => String(p.location) === String(cityFilter));
+    }
+
+    if (landMarkFilter) {
+      filtered = filtered.filter((p) => String(p.landmark) === String(landMarkFilter));
+    }
 
     if (sortOrder === "newest") {
       filtered = filtered.slice().sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
@@ -91,6 +100,8 @@ const AllLandsAdmin = () => {
     sortOrder,
     bhkFilter,
     properties,
+    cityFilter,
+    landMarkFilter
   ]);
 
   const handleSubFilterChange = (type, value) => {
@@ -99,6 +110,8 @@ const AllLandsAdmin = () => {
     else if (type === "price") setPriceRange(value);
     else if (type === "sort") setSortOrder(value);
     else if (type === "bhk") setBhkFilter(value);
+     else if (type === "location") setCityFilter(value);
+      else if (type === "landmark") setlandMarkFilter(value);
 
     if (!activeFilters.some((f) => f.type === type)) {
       setActiveFilters((prev) => [...prev, { type, value }]);
@@ -115,6 +128,8 @@ const AllLandsAdmin = () => {
     if (type === "price") setPriceRange("");
     if (type === "sort") setSortOrder("");
     if (type === "bhk") setBhkFilter("");
+     if (type === "location") setCityFilter("");
+   if (type === "landmark") setlandMarkFilter(""); 
     setActiveFilters((prev) => prev.filter((f) => f.type !== type));
   };
 
@@ -167,6 +182,7 @@ const AllLandsAdmin = () => {
             <option value="Flat">Flat</option>
             <option value="House">House</option>
             <option value="Apartment">Apartment</option>
+             <option value="office space">office space</option>
             {/*   <option value="Flats">Flats</option>
             <option value="Builder Floors">Builder Floors</option>
             <option value="House Villas">House Villas</option>
@@ -211,6 +227,51 @@ const AllLandsAdmin = () => {
             <option value="4">4 BHK</option>
             <option value="5">5+ BHK</option>
           </select>
+          
+           <select
+            value={cityFilter}
+            onChange={(e) => handleSubFilterChange("location", e.target.value)}
+            className="border border-gray-300 rounded-md px-3 py-2"
+          >
+            <option value="">Select City</option>
+            <option value="bhopal">Bhopal</option>
+            <option value="indore">Indore</option>
+           
+           
+          </select>
+
+         <select
+  value={landMarkFilter}
+  onChange={(e) => handleSubFilterChange("landmark", e.target.value)}
+  className="border border-gray-300 rounded-md px-3 py-2"
+>
+  <option value="">Select Landmark</option>
+
+  {(cityFilter === "bhopal"
+    ? [
+        "Mp nagar", "Kolar", "Hoshangabad road", "Shahpura", "Chunabhatti",
+        "Ashoka garden", "Rachna Nagar", "Shivaji nagar", "Saket nagar",
+        "Bawadiya kalan", "Gulmohar", "Punjabi bagh", "Bittan market",
+        "Gautam nagar", "Old subhash nagar", "Arera colony", "Indrapuri",
+        "Rohit nagar"
+      ]
+    : cityFilter === "indore"
+    ? [
+        "Navlakha", "Pipaliya pala park", "Musakhedi", "Khajrana", "Kalani nagar",
+        "Sangam nagar", "Vijaynagar", "Bhanwarkua", "Mahalakshmi nagar", "Rau",
+        "Lal bagh palace", "Dhabli", "Niranjanpur", "Nipania", "Bicholi mardana",
+        "Rajendra Nagar", "Chandan nagar", "Sukhaliya", "Palasiya", "Pardesipura",
+        "Tilak Nagar", "Alok nagar", "South tukoganj", "Mari mata square",
+        "Luv kush square", "Nanda nagar", "Super corridor", "Mhow", "Dewas Naka",
+        "Scheme no 140", "Mr 10", "Mr 11", "Gandhi Nagar"
+      ]
+    : []
+  ).map((landmark, idx) => (
+    <option key={idx} value={landmark}>
+      {landmark}
+    </option>
+  ))}
+</select>
         </div>
 
         {/* Group 2: Sort By and Listing */}

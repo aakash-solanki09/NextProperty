@@ -23,7 +23,8 @@ const AllPublicProperties = () => {
   const [selectedProperty, setSelectedProperty] = useState(null);
   const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
-
+ const [landMarkFilter, setlandMarkFilter] = useState("");
+  const [cityFilter, setCityFilter] = useState("");
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -79,8 +80,16 @@ const AllPublicProperties = () => {
       filtered = [...filtered].sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
     }
 
+    if (cityFilter) {
+      filtered = filtered.filter((p) => String(p.location) === String(cityFilter));
+    }
+
+    if (landMarkFilter) {
+      filtered = filtered.filter((p) => String(p.landmark) === String(landMarkFilter));
+    }
+
     setFilteredProperties(filtered);
-  }, [search, typeFilter, listingFilter, priceRange, bhkFilter, sortOrder, properties]);
+  }, [search, typeFilter, listingFilter, priceRange, bhkFilter, sortOrder, properties, cityFilter,  landMarkFilter]);
 
   useEffect(() => {
     const checkMobile = () => {
@@ -98,6 +107,8 @@ const AllPublicProperties = () => {
     else if (type === "price") setPriceRange(value);
     else if (type === "sort") setSortOrder(value);
     else if (type === "bhk") setBhkFilter(value); 
+     else if (type === "location") setCityFilter(value);
+      else if (type === "landmark") setlandMarkFilter(value);
 
     if (!activeFilters.some((f) => f.type === type)) {
       setActiveFilters((prev) => [...prev, { type, value }]);
@@ -111,7 +122,9 @@ const AllPublicProperties = () => {
     if (type === "listing") setListingFilter("");
     if (type === "price") setPriceRange("");
     if (type === "sort") setSortOrder("");
-    if (type === "bhk") setBhkFilter(""); // ✅ Clear BHK
+    if (type === "bhk") setBhkFilter(""); 
+      if (type === "location") setCityFilter("");
+   if (type === "landmark") setlandMarkFilter(""); 
     setActiveFilters((prev) => prev.filter((f) => f.type !== type));
   };
 
@@ -169,16 +182,60 @@ const AllPublicProperties = () => {
           <p className="text-lg md:text-2xl text-white text-center  drop-shadow-lg">Browse the best properties for sale and rent in your city</p>
           {/* Filters/Search Bar in Hero */}
           <div className="w-full max-w-3xl bg-opacity-90 rounded-xl  p-4 flex flex-col sm:flex-row gap-4 items-center justify-center">
-            <div className="relative w-full sm:w-[40%]">
+            <div className="relative w-full sm:w-[20%]">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
               <input
                 type="text"
-                placeholder="Search by city, landmark, title..."
+                placeholder="Search by"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 className="w-full border border-gray-300 rounded-md pl-9 pr-3 py-2 focus:outline-none focus:ring-1 focus:ring-blue-400"
               />
             </div>
+            <select
+            value={cityFilter}
+            onChange={(e) => handleSubFilterChange("location", e.target.value)}
+            className="border border-gray-300 rounded-md px-3 py-2"
+          >
+            <option value="">Select City</option>
+            <option value="bhopal">Bhopal</option>
+            <option value="indore">Indore</option>
+           
+           
+          </select>
+
+         <select
+  value={landMarkFilter}
+  onChange={(e) => handleSubFilterChange("landmark", e.target.value)}
+  className="border border-gray-300 rounded-md px-3 py-2"
+>
+  <option value="">Select Landmark</option>
+
+  {(cityFilter === "bhopal"
+    ? [
+        "Mp nagar", "Kolar", "Hoshangabad road", "Shahpura", "Chunabhatti",
+        "Ashoka garden", "Rachna Nagar", "Shivaji nagar", "Saket nagar",
+        "Bawadiya kalan", "Gulmohar", "Punjabi bagh", "Bittan market",
+        "Gautam nagar", "Old subhash nagar", "Arera colony", "Indrapuri",
+        "Rohit nagar"
+      ]
+    : cityFilter === "indore"
+    ? [
+        "Navlakha", "Pipaliya pala park", "Musakhedi", "Khajrana", "Kalani nagar",
+        "Sangam nagar", "Vijaynagar", "Bhanwarkua", "Mahalakshmi nagar", "Rau",
+        "Lal bagh palace", "Dhabli", "Niranjanpur", "Nipania", "Bicholi mardana",
+        "Rajendra Nagar", "Chandan nagar", "Sukhaliya", "Palasiya", "Pardesipura",
+        "Tilak Nagar", "Alok nagar", "South tukoganj", "Mari mata square",
+        "Luv kush square", "Nanda nagar", "Super corridor", "Mhow", "Dewas Naka",
+        "Scheme no 140", "Mr 10", "Mr 11", "Gandhi Nagar"
+      ]
+    : []
+  ).map((landmark, idx) => (
+    <option key={idx} value={landmark}>
+      {landmark}
+    </option>
+  ))}
+</select>
             <select
               value={sortOrder}
               onChange={(e) => handleSubFilterChange('sort', e.target.value)}
@@ -208,6 +265,7 @@ const AllPublicProperties = () => {
                       <option value="Flat">Flat</option>
                       <option value="House">House</option>
                       <option value="Apartment">Apartment</option>
+                      <option value="office space">office space</option>
                       {/*    <option value="Flats">Flats</option>
                       <option value="Builder Floors">Builder Floors</option>
                       <option value="House Villas">House Villas</option>
