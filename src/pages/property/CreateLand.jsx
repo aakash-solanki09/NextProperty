@@ -106,6 +106,7 @@ const CreateLand = () => {
       <option value="Flat">Flat</option>
       <option value="House">House</option>
       <option value="Apartment">Apartment</option>
+      <option value="office space">office space</option>
     </select>
   </div>
 
@@ -125,6 +126,7 @@ const CreateLand = () => {
   </div>
 
   {/* BHK */}
+   {formData.typeOfProperty !== "office space" && (
   <div>
     <label className="block text-sm font-medium text-gray-700 mb-1">BHK</label>
     <input
@@ -136,7 +138,7 @@ const CreateLand = () => {
       onChange={handleChange}
     />
   </div>
-
+   )}
   {/* Carpet Area - only if listingType is sale */}
   {formData.listingType === "sale" && (
     <div>

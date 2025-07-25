@@ -356,15 +356,18 @@ const AllPublicProperties = () => {
                 <p className="text-gray-500 text-xs mb-1 truncate font-semibold">city : {property.location}</p>
                 <p className="text-gray-500 text-xs mb-1 truncate font-semibold">LandMark : {property.landmark}</p>
                </div>
-                  <div className="flex items-center gap-3 ">
+                   <p className="text-gray-500 text-xs mb-1 truncate font-semibold">Type : {property.typeOfProperty}</p>
+                <div className="flex items-center gap-3 ">
+                  {property.typeOfProperty?.toLowerCase() !== 'office space' && (
                     <span className="inline-block bg-gray-100 text-gray-700 px-2 py-0.5 rounded text-xs font-medium">{property.bhk} BHK</span>
-                    <span className="inline-block bg-gray-100 text-gray-700 px-2 py-0.5 rounded text-xs font-medium"> Area: {property.buildUpArea} sq.ft</span>
-                    {property.listingType?.toLowerCase() === 'sale' && (
-                      <div className="flex flex-wrap gap-3 ">
-                        <span className="inline-block bg-gray-100 text-gray-700 px-2 py-0.5 rounded text-xs font-medium">Carpet Area: {property.carpetArea} sq.ft</span>
-                      </div>
-                    )}
-                  </div>
+                  )}
+                  <span className="inline-block bg-gray-100 text-gray-700 px-2 py-0.5 rounded text-xs font-medium">{property.buildUpArea} Area sq.ft</span>
+                  {property.listingType?.toLowerCase() === 'sale' && (
+                    <div className="flex flex-wrap gap-3 ">
+                      <span className="inline-block bg-gray-100 text-gray-700 px-2 py-0.5 rounded text-xs font-medium">Carpet Area: {property.carpetArea} sq.ft</span>
+                    </div>
+                  )}
+                </div>
                   <div className="flex gap-10">
                     <p className="text-xs text-gray-500">
                       {property.furnishedType}
@@ -489,7 +492,9 @@ const AllPublicProperties = () => {
               </div>
 
                 <div className="flex flex-wrap gap-3 mb-2">
-                  <span className="inline-block bg-gray-100 text-gray-700 px-3 py-1 rounded text-xs font-medium">BHK: {selectedProperty.bhk}</span>
+                 {selectedProperty.typeOfProperty?.toLowerCase() !== 'office space' && (
+                    <span className="inline-block bg-gray-100 text-gray-700 px-2 py-0.5 rounded text-xs font-medium">{selectedProperty.bhk} BHK</span>
+                  )}
                   <span className="inline-block bg-gray-50 text-gray-800 px-3 py-1 rounded text-xs font-medium border">Area: {selectedProperty.buildUpArea} sq.ft</span>
                   {selectedProperty.listingType?.toLowerCase() === 'sale' && (
                     <div className="flex flex-wrap gap-3 mb-2">

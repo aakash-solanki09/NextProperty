@@ -152,6 +152,7 @@ const UpdateLand = () => {
       <option value="Flat">Flat</option>
       <option value="House">House</option>
       <option value="Apartment">Apartment</option>
+      <option value="office space">office space</option>
     </select>
   </div>
 
@@ -171,6 +172,7 @@ const UpdateLand = () => {
   </div>
 
   {/* BHK */}
+   {formData.typeOfProperty !== "office space" && (
   <div>
     <label className="block text-sm font-medium text-black mb-1">BHK (Optional)</label>
     <input
@@ -182,7 +184,7 @@ const UpdateLand = () => {
       onChange={handleChange}
     />
   </div>
-
+   )}
   {/* Built-up Area */}
   <div>
     <label className="block text-sm font-medium text-black mb-1">Built-up Area (Optional)</label>
