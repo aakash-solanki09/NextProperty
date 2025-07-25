@@ -195,7 +195,7 @@ const AllPublicProperties = () => {
             <select
             value={cityFilter}
             onChange={(e) => handleSubFilterChange("location", e.target.value)}
-            className="border border-gray-300 rounded-md px-3 py-2"
+            className="border border-gray-300 rounded-md px-3 py-2 text-center w-full lg:w-40 md:w-40 xl:w-44"
           >
             <option value="">Select City</option>
             <option value="bhopal">Bhopal</option>
@@ -207,7 +207,7 @@ const AllPublicProperties = () => {
          <select
   value={landMarkFilter}
   onChange={(e) => handleSubFilterChange("landmark", e.target.value)}
-  className="border border-gray-300 rounded-md px-3 py-2"
+  className="border border-gray-300 rounded-md px-3 py-2 w-full text-center lg:w-44 md:w-44 xl:w-44"
 >
   <option value="">Select Landmark</option>
 
