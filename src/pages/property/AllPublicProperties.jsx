@@ -192,59 +192,6 @@ const AllPublicProperties = () => {
                 className="w-full border border-gray-300 rounded-md pl-9 pr-3 py-2 focus:outline-none focus:ring-1 focus:ring-blue-400"
               />
             </div>
-            <select
-            value={cityFilter}
-            onChange={(e) => handleSubFilterChange("location", e.target.value)}
-            className="border border-gray-300 rounded-md px-3 py-2 text-center w-full lg:w-40 md:w-40 xl:w-44"
-          >
-            <option value="">Select City</option>
-            <option value="bhopal">Bhopal</option>
-            <option value="indore">Indore</option>
-           
-           
-          </select>
-
-         <select
-  value={landMarkFilter}
-  onChange={(e) => handleSubFilterChange("landmark", e.target.value)}
-  className="border border-gray-300 rounded-md px-3 py-2 w-full text-center lg:w-44 md:w-44 xl:w-44"
->
-  <option value="">Select Landmark</option>
-
-  {(cityFilter === "bhopal"
-    ? [
-        "Mp nagar", "Kolar", "Hoshangabad road", "Shahpura", "Chunabhatti",
-        "Ashoka garden", "Rachna Nagar", "Shivaji nagar", "Saket nagar",
-        "Bawadiya kalan", "Gulmohar", "Punjabi bagh", "Bittan market",
-        "Gautam nagar", "Old subhash nagar", "Arera colony", "Indrapuri",
-        "Rohit nagar"
-      ]
-    : cityFilter === "indore"
-    ? [
-        "Navlakha", "Pipaliya pala park", "Musakhedi", "Khajrana", "Kalani nagar",
-        "Sangam nagar", "Vijaynagar", "Bhanwarkua", "Mahalakshmi nagar", "Rau",
-        "Lal bagh palace", "Dhabli", "Niranjanpur", "Nipania", "Bicholi mardana",
-        "Rajendra Nagar", "Chandan nagar", "Sukhaliya", "Palasiya", "Pardesipura",
-        "Tilak Nagar", "Alok nagar", "South tukoganj", "Mari mata square",
-        "Luv kush square", "Nanda nagar", "Super corridor", "Mhow", "Dewas Naka",
-        "Scheme no 140", "Mr 10", "Mr 11", "Gandhi Nagar"
-      ]
-    : []
-  ).map((landmark, idx) => (
-    <option key={idx} value={landmark}>
-      {landmark}
-    </option>
-  ))}
-</select>
-            <select
-              value={sortOrder}
-              onChange={(e) => handleSubFilterChange('sort', e.target.value)}
-              className="border border-gray-300 rounded-md px-3 py-2 text-center w-full  lg:w-20 md:w-20 xl:w-20"
-            >
-              <option value="">Sort By</option>
-              <option value="newest">Newest</option>
-              <option value="oldest">Oldest</option>
-            </select>
             <div className="relative w-full sm:w-auto">
               <button
                 onClick={() => setShowAdvancedFilters(!showAdvancedFilters)}
@@ -318,6 +265,60 @@ const AllPublicProperties = () => {
                 </div>
               )}
             </div>
+            <select
+            value={cityFilter}
+            onChange={(e) => handleSubFilterChange("location", e.target.value)}
+            className="border border-gray-300 rounded-md px-3 py-2 text-center w-full lg:w-40 md:w-40 xl:w-44"
+          >
+            <option value="">Select City</option>
+            <option value="bhopal">Bhopal</option>
+            <option value="indore">Indore</option>
+           
+           
+          </select>
+
+         <select
+  value={landMarkFilter}
+  onChange={(e) => handleSubFilterChange("landmark", e.target.value)}
+  className="border border-gray-300 rounded-md px-3 py-2 w-full text-center lg:w-44 md:w-44 xl:w-44"
+>
+  <option value="">Select Landmark</option>
+
+  {(cityFilter === "bhopal"
+    ? [
+        "Mp nagar", "Kolar", "Hoshangabad road", "Shahpura", "Chunabhatti",
+        "Ashoka garden", "Rachna Nagar", "Shivaji nagar", "Saket nagar",
+        "Bawadiya kalan", "Gulmohar", "Punjabi bagh", "Bittan market",
+        "Gautam nagar", "Old subhash nagar", "Arera colony", "Indrapuri",
+        "Rohit nagar"
+      ]
+    : cityFilter === "indore"
+    ? [
+        "Navlakha", "Pipaliya pala park", "Musakhedi", "Khajrana", "Kalani nagar",
+        "Sangam nagar", "Vijaynagar", "Bhanwarkua", "Mahalakshmi nagar", "Rau",
+        "Lal bagh palace", "Dhabli", "Niranjanpur", "Nipania", "Bicholi mardana",
+        "Rajendra Nagar", "Chandan nagar", "Sukhaliya", "Palasiya", "Pardesipura",
+        "Tilak Nagar", "Alok nagar", "South tukoganj", "Mari mata square",
+        "Luv kush square", "Nanda nagar", "Super corridor", "Mhow", "Dewas Naka",
+        "Scheme no 140", "Mr 10", "Mr 11", "Gandhi Nagar"
+      ]
+    : []
+  ).map((landmark, idx) => (
+    <option key={idx} value={landmark}>
+      {landmark}
+    </option>
+  ))}
+</select>
+            <select
+              value={sortOrder}
+              onChange={(e) => handleSubFilterChange('sort', e.target.value)}
+              className="border border-gray-300 rounded-md px-3 py-2 text-center w-full  lg:w-20 md:w-20 xl:w-20"
+            >
+              <option value="">Sort By</option>
+              <option value="newest">Newest</option>
+              <option value="oldest">Oldest</option>
+            </select>
+            
           </div>
           {/* Active Filters below search/filter bar */}
           {activeFilters.length > 0 && (
