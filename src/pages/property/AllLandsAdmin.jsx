@@ -153,6 +153,16 @@ const AllLandsAdmin = () => {
     setModalType("view");
   };
 
+  const confirmDelete = async () => {
+    if (selectedProperty) {
+      await deleteProperty(selectedProperty._id);
+      const updated = properties.filter((prop) => prop._id !== selectedProperty._id);
+      setProperties(updated);
+      setFilteredProperties(updated);
+      setSelectedProperty(null);
+    }
+  };
+
   return (
     <div className="max-w-7xl mx-auto mt-6 px-4">
       <h2 className="text-2xl font-bold mb-4 text-center">Manage All Properties</h2>
@@ -435,7 +445,7 @@ const AllLandsAdmin = () => {
       </div>
 
       {/* View Modal */}
-      {selectedProperty && (
+      {selectedProperty && modalType !== "delete" &&  (
         <div className="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center p-4">
           <div className="bg-white w-[80%] max-w-5xl rounded-2xl shadow-2xl overflow-y-auto max-h-[100vh] relative flex flex-col lg:flex-row">
             <button

@@ -36,8 +36,8 @@ const CreateLand = () => {
     const newFiles = Array.from(e.target.files);
     const combined = [...images, ...newFiles];
 
-    if (combined.length > 5) {
-      setError("You can upload a maximum of 5 images.");
+    if (combined.length > 15) {
+      setError("You can upload a maximum of 15 images.");
       return;
     }
 
@@ -336,7 +336,7 @@ const CreateLand = () => {
       className="flex flex-col items-center justify-center border-2 border-dashed border-gray-300 rounded-xl p-5 cursor-pointer hover:border-blue-500 transition"
     >
       <Upload className="w-6 h-6 text-blue-600 mb-2" />
-      <span className="text-sm text-gray-600">Upload up to 5 images</span>
+      <span className="text-sm text-gray-600">Upload up to 15 images</span>
       <input
         id="image-upload"
         type="file"

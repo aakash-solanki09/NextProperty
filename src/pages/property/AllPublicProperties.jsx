@@ -195,7 +195,7 @@ const AllPublicProperties = () => {
             <div className="relative w-full sm:w-auto">
               <button
                 onClick={() => setShowAdvancedFilters(!showAdvancedFilters)}
-                className="border border-gray-300 rounded-md px-3 py-2 w-full bg-white"
+                className="border border-gray-300 rounded-md px-3 py-2  w-full text-center lg:w-44 md:w-44 xl:w-44 bg-white"
               >
                 More Filters
               </button>

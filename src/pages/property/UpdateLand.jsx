@@ -367,7 +367,7 @@ const UpdateLand = () => {
     >
       <Upload className="w-6 h-6 text-blue-600 mb-2" />
       <span className="text-sm text-gray-600">
-        Upload up to 5 new images (optional)
+        Upload up to 15 new images (optional)
       </span>
       <input
         id="image-upload"
